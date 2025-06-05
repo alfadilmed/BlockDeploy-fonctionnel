@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlockDeploy - Deploy Smart Contracts Codelessly</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class', // or 'media' if you prefer system setting
+      theme: {
+        extend: {
+          colors: {
+            'brand-primary': '#0D0F1E', // Deep dark blue/purple
+            'brand-secondary': '#1A1C2D', // Slightly lighter dark
+            'brand-accent-blue': '#00A8FF', // Neon Blue
+            'brand-accent-purple': '#A020F0', // Neon Purple
+            'brand-glass': 'rgba(26, 28, 45, 0.6)', // For glassmorphism
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'], // Example modern font
+          },
+          boxShadow: {
+            'neon-blue': '0 0 15px 5px rgba(0, 168, 255, 0.4)',
+            'neon-purple': '0 0 15px 5px rgba(160, 32, 240, 0.4)',
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif; /* Ensure Inter or a similar font is loaded or available */
+    }
+    /* Custom scrollbar for a more modern look */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1A1C2D; /* brand-secondary */
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3A3C5A; /* A muted accent */
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00A8FF; /* brand-accent-blue */
+    }
+
+    /* GlowButton Animations */
+    @keyframes subtle-glow-blue-animation {
+      0%, 100% { box-shadow: 0 0 12px 3px rgba(0, 168, 255, 0.35), 0 0 6px 1px rgba(0, 168, 255, 0.25); }
+      50% { box-shadow: 0 0 20px 7px rgba(0, 168, 255, 0.55), 0 0 12px 3px rgba(0, 168, 255, 0.45); }
+    }
+    @keyframes subtle-glow-purple-animation {
+      0%, 100% { box-shadow: 0 0 12px 3px rgba(160, 32, 240, 0.35), 0 0 6px 1px rgba(160, 32, 240, 0.25); }
+      50% { box-shadow: 0 0 20px 7px rgba(160, 32, 240, 0.55), 0 0 12px 3px rgba(160, 32, 240, 0.45); }
+    }
+    .animate-glow-blue {
+      animation: subtle-glow-blue-animation 2.5s ease-in-out infinite;
+    }
+    .animate-glow-purple {
+      animation: subtle-glow-purple-animation 2.5s ease-in-out infinite;
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.6.1",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.511.0",
+    "@heroicons/react/": "https://esm.sh/@heroicons/react@^2.2.0/",
+    "framer-motion": "https://esm.sh/framer-motion@^11.3.8",
+    "recharts": "https://esm.sh/recharts@^2.12.7"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-brand-primary text-slate-200">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
