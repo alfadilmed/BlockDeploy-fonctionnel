@@ -41,7 +41,7 @@ Ce projet est développé et maintenu par **Primex Software**.
 
 Primex Software est une entreprise de services numériques spécialisée en développement sur mesure, conception d'interfaces (UI/UX), et conseil en technologies de l'information, avec une expertise pointue dans le domaine de la blockchain. Nous accompagnons nos clients dans la transformation digitale et l'adoption des technologies Web3.
 
-Pour en savoir plus : [https://primex-software.com](https://primex-software.com)
+Pour en savoir plus : [https://primex.software](https://primex.software)
 
 ## 📄 Licence
 
