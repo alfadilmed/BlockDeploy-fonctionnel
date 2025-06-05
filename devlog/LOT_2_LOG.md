@@ -15,32 +15,41 @@
 *   **L2-M2.3:** Intégration avec la file d'attente (Lot 2) (TERMINÉ)
 
 ---
-## 2023-11-01 (Date Simulé)
-*(Ajustement de la date précédente pour la clarté, les tâches M2.3 et M3.1 peuvent être sur des jours différents ou le même jour si petites)*
+## 2023-11-02 (Date Simulé)
 
 ### Fait ✅
-*   *(Les tâches de M2.3 étaient ici, déplacées au 2023-10-31 pour cet exemple de log)*
+*   **L2-M3.1:** Configuration du `ProviderService` pour Polygon (Lot 2) (TERMINÉ)
+*   **L2-M3.2:** Tests de connectivité et de déploiement de base sur Polygon (Lot 2) (TERMINÉ - Conceptuel)
 
 ---
-## 2023-11-02 (Date Simulé - Cette journée)
+## 2023-11-03 (Date Simulé)
 
 ### Fait ✅
-*   **L2-M3.1: Configuration du `ProviderService` pour Polygon (Lot 2) (TERMINÉ)**
-    *   Documentation des modifications à apporter au `ProviderService` pour inclure les configurations RPC de Polygon Mainnet et Mumbai Testnet.
-    *   Référence aux variables d'environnement `POLYGON_MUMBAI_RPC_URL` et `POLYGON_MAINNET_RPC_URL`.
-    *   Fichier `docs/architecture/L2_M3_1_POLYGON_PROVIDER_CONFIG.md` créé.
+*   **L2-M4.1:** Création du formulaire de configuration UI/UX (Lot 2) (TERMINÉ)
+*   **L2-M4.2:** Logique frontend pour l'appel API (Lot 2) (TERMINÉ)
+*   **L2-M4.3:** Affichage du feedback post-déploiement (Lot 2) (TERMINÉ)
+
+---
+## 2023-11-04 (Date Simulé - Cette journée)
+
+### Fait ✅
+*   **L2-M5.1: Tests E2E du déploiement ERC-20 MVP (Lot 2) - Conceptuel (TERMINÉ)**
+    *   Documentation (`docs/testing/L2_M5_1_ERC20MVP_E2E_TEST_CONCEPT.md`).
+*   **L2-M5.2: Mise à jour de la documentation utilisateur (Lot 2) (TERMINÉ)**
+    *   Identification des sections à mettre à jour/créer pour l'ERC-20 MVP et Polygon.
+    *   Description du contenu (guides, FAQ, glossaire).
+    *   Fichier `docs/user_guides/L2_M5_2_USER_DOC_UPDATES.md` créé.
 
 ### En Cours ⏳
 *   Aucun.
 
 ### Prochaines Étapes 🚀
-*   **L2-M3.2:** Tests de connectivité et de déploiement de base sur Polygon (Conceptuel).
-*   **L2-M4.1:** Création du formulaire de configuration UI/UX pour ERC-20 MVP.
-*   **L2-M4.2:** Logique frontend pour l'appel API de déploiement ERC-20 MVP.
+*   Présenter le Lot 2 comme complété (conceptuellement).
+*   Attendre le feedback utilisateur pour la planification et l'exécution du Lot 3.
 
 ### Blocages  блокировка
 *   Nécessité d'un environnement de compilation Solidity (Hardhat/Foundry) pour ABI/bytecodes finaux des templates ERC-20 MVP.
-*   Nécessité d'URLs RPC valides pour Polygon (Mumbai et Mainnet) dans les variables d'environnement pour des tests réels.
+*   Nécessité d'URLs RPC valides et d'un wallet serveur financé sur Polygon (Mumbai et Mainnet) pour des tests réels.
 EOF
 
-echo "devlog/LOT_2_LOG.md mis à jour pour L2-M3.1."
+echo "devlog/LOT_2_LOG.md mis à jour pour L2-M5.2. Lot 2 conceptuellement terminé."
