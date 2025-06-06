@@ -434,3 +434,101 @@ Retrieves detailed information about a deployed smart contract, combining data s
         }
         ```
 *   `500 Internal Server Error`: For unexpected server-side errors, including issues fetching data from the blockchain if not gracefully handled to return partial data.
+
+
+---
+
+## ERC-20 Contract Actions
+
+The following endpoints allow authenticated users to perform actions on ERC-20 contracts they own or manage.
+
+### Pause ERC-20 Contract
+
+*   **Endpoint:** `POST /api/v1/contracts/:network/:address/erc20/pause`
+*   **Description:** Attempts to pause a pausable ERC-20 smart contract. This typically restricts token transfers.
+*   **Authentication:** Requires Bearer Token. User must have appropriate permissions (e.g., owner or pauser role) on the contract, as verified by the backend logic.
+*   **Path Parameters:**
+    *   `network` (string, required): The network of the contract (e.g., "sepolia").
+    *   `address` (string, required): The contract address.
+*   **Request Body:** None.
+*   **Success Response (200 OK):**
+    *   **Content-Type:** `application/json`
+    *   **Body (`ActionResponse`):**
+        *   `success` (boolean): `true` if the action was successfully initiated.
+        *   `transactionHash` (string): The hash of the submitted blockchain transaction.
+        *   `message` (string): A confirmation message.
+    *   **Example:**
+        ```json
+        {
+          "success": true,
+          "transactionHash": "0x123abc...",
+          "message": "Pause action initiated successfully for contract 0x... Transaction hash: 0x123abc..."
+        }
+        ```
+*   **Error Responses:**
+    *   `400 Bad Request`: If the contract is already paused, or not pausable based on its deployment configuration.
+    *   `401 Unauthorized`: Invalid or missing authentication token.
+    *   `403 Forbidden`: Authenticated user does not have permission to pause this contract.
+    *   `404 Not Found`: Contract not found at the specified address/network for the user.
+    *   `500 Internal Server Error`: If the pause transaction fails on the blockchain or an unexpected server error occurs.
+
+---
+
+### Unpause ERC-20 Contract
+
+*   **Endpoint:** `POST /api/v1/contracts/:network/:address/erc20/unpause`
+*   **Description:** Attempts to unpause a pausable ERC-20 smart contract that is currently paused.
+*   **Authentication:** Requires Bearer Token. User must have appropriate permissions.
+*   **Path Parameters:**
+    *   `network` (string, required): The network of the contract.
+    *   `address` (string, required): The contract address.
+*   **Request Body:** None.
+*   **Success Response (200 OK):**
+    *   **Content-Type:** `application/json`
+    *   **Body (`ActionResponse`):** (Same structure as Pause)
+    *   **Example:**
+        ```json
+        {
+          "success": true,
+          "transactionHash": "0x456def...",
+          "message": "Unpause action initiated successfully for contract 0x... Transaction hash: 0x456def..."
+        }
+        ```
+*   **Error Responses:**
+    *   `400 Bad Request`: If the contract is not currently paused, or not pausable.
+    *   `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error` (similar to Pause).
+
+---
+
+### Mint ERC-20 Tokens
+
+*   **Endpoint:** `POST /api/v1/contracts/:network/:address/erc20/mint`
+*   **Description:** Mints new tokens for a mintable ERC-20 smart contract.
+*   **Authentication:** Requires Bearer Token. User must have appropriate permissions (e.g., owner or minter role).
+*   **Path Parameters:**
+    *   `network` (string, required): The network of the contract.
+    *   `address` (string, required): The contract address.
+*   **Request Body (`MintRequestDto`):**
+    *   `recipient` (string, required, Ethereum address): The address to receive the new tokens.
+    *   `amount` (string, required, positive integer string): The amount of tokens to mint, in the smallest unit of the token (e.g., wei for a token with 18 decimals).
+    *   **Example:**
+        ```json
+        {
+          "recipient": "0xRecipientAddress...",
+          "amount": "1000000000000000000" // 1 token if 18 decimals
+        }
+        ```
+*   **Success Response (200 OK):**
+    *   **Content-Type:** `application/json`
+    *   **Body (`ActionResponse`):** (Same structure as Pause/Unpause)
+    *   **Example:**
+        ```json
+        {
+          "success": true,
+          "transactionHash": "0x789ghi...",
+          "message": "Mint action initiated successfully for contract 0x... to 0xRecipientAddress.... Amount: 1000... Transaction hash: 0x789ghi..."
+        }
+        ```
+*   **Error Responses:**
+    *   `400 Bad Request`: Invalid request body (e.g., missing fields, invalid address format, non-positive amount, amount exceeds cap, contract is paused).
+    *   `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error` (similar to Pause/Unpause).

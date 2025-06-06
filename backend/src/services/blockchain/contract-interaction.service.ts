@@ -150,4 +150,86 @@ export class ContractInteractionService {
       throw new InternalServerErrorException(`Failed to mint tokens: ${error.reason || error.message}`);
     }
   }
+
+  // --- ERC721 Specific Actions ---
+
+  async pauseERC721(network: string, contractAddress: string, userId: string): Promise<{ transactionHash: string }> {
+    this.logger.log(\`Attempting to PAUSE ERC721 contract \${contractAddress} on \${network} by user \${userId}\`);
+    const { contract, dbInfo } = await this.getSignerAndContract(network, contractAddress, PAUSABLE_ABI, userId);
+
+    if (!dbInfo.isPausable) {
+        throw new BadRequestException(\`Contract \${dbInfo.userGivenName} (\${contractAddress}) was not configured as pausable for ERC721.\`);
+    }
+
+    try {
+      const tx: ContractTransaction = await contract.pause();
+      this.logger.log(\`ERC721 Pause transaction sent for \${contractAddress}. Hash: \${tx.hash}\`);
+      return { transactionHash: tx.hash };
+    } catch (error) {
+      this.logger.error(\`Error pausing ERC721 contract \${contractAddress}: \${error.message}\`, error.stack);
+      throw new InternalServerErrorException(\`Failed to pause ERC721 contract: \${error.reason || error.message}\`);
+    }
+  }
+
+  async unpauseERC721(network: string, contractAddress: string, userId: string): Promise<{ transactionHash: string }> {
+    this.logger.log(\`Attempting to UNPAUSE ERC721 contract \${contractAddress} on \${network} by user \${userId}\`);
+    const { contract, dbInfo } = await this.getSignerAndContract(network, contractAddress, PAUSABLE_ABI, userId);
+
+    if (!dbInfo.isPausable) {
+        throw new BadRequestException(\`Contract \${dbInfo.userGivenName} (\${contractAddress}) was not configured as pausable for ERC721.\`);
+    }
+
+    try {
+      const tx: ContractTransaction = await contract.unpause();
+      this.logger.log(\`ERC721 Unpause transaction sent for \${contractAddress}. Hash: \${tx.hash}\`);
+      return { transactionHash: tx.hash };
+    } catch (error) {
+      this.logger.error(\`Error unpausing ERC721 contract \${contractAddress}: \${error.message}\`, error.stack);
+      throw new InternalServerErrorException(\`Failed to unpause ERC721 contract: \${error.reason || error.message}\`);
+    }
+  }
+
+  async mintNFT(
+    network: string,
+    contractAddress: string,
+    recipient: string,
+    tokenId: string,
+    tokenURI: string,
+    userId: string,
+  ): Promise<{ transactionHash: string }> {
+    this.logger.log(
+      \`Attempting to MINT NFT for contract \${contractAddress} on \${network} by user \${userId}. ` +
+      \`Recipient: \${recipient}, TokenID: \${tokenId}, TokenURI (from DTO): \${tokenURI}\`
+    );
+
+    if (!ethers.utils.isAddress(recipient)) {
+      throw new BadRequestException('Invalid recipient address for NFT minting.');
+    }
+    try {
+      ethers.BigNumber.from(tokenId);
+       if (ethers.BigNumber.from(tokenId).isNegative()) {
+            throw new Error('TokenID cannot be negative.');
+        }
+    } catch (e) {
+      throw new BadRequestException('Invalid TokenID. Must be a positive integer string.');
+    }
+    this.logger.warn(\`The provided tokenURI parameter ('\${tokenURI}') is not directly used by the current ERC721MVP contract's mint function. The contract generates tokenURI from its baseURI and the tokenId.\`);
+
+    const ERC721_MINT_ABI = [
+      'function safeMintWithId(address to, uint256 tokenId)',
+      'function owner() view returns (address)',
+    ];
+
+    const { contract } = await this.getSignerAndContract(network, contractAddress, ERC721_MINT_ABI, userId);
+
+    try {
+      const tx: ContractTransaction = await contract.safeMintWithId(recipient, ethers.BigNumber.from(tokenId));
+      this.logger.log(\`NFT Mint transaction sent for \${contractAddress} (TokenID: \${tokenId}). Hash: \${tx.hash}\`);
+      return { transactionHash: tx.hash };
+    } catch (error) {
+      this.logger.error(\`Error minting NFT for \${contractAddress} (TokenID: \${tokenId}): \${error.message}\`, error.stack);
+      throw new InternalServerErrorException(\`Failed to mint NFT: \${error.reason || error.message}\`);
+    }
+  }
+
 }

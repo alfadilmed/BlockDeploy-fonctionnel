@@ -8,8 +8,9 @@ import { DeploymentDataService } from './services/deployment-data.service';
 // import { ContractQueryService } from '../../services/blockchain/contract-query.service';
 // import { ProviderService } from '../../services/blockchain/provider.service';
 
+import { ContractActionsController } from './controllers/contract-actions.controller';
 @Module({
-  controllers: [ContractDetailsController],
+  controllers: [ContractDetailsController, ContractActionsController],
   providers: [
     DeploymentDataService,
     // ContractQueryService, // Si importé localement

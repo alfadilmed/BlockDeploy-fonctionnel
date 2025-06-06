@@ -187,3 +187,104 @@
   - Envoi des transactions et gestion basique des erreurs.
   - Ajout d'une méthode placeholder `getSigner()` à `ProviderService` utilisant une variable d'environnement `BACKEND_SIGNER_PRIVATE_KEY` (pour développement/test uniquement).
   - Ajout de `ContractInteractionService` aux providers de `AppModule`.
+
+
+**L5-M2.3.1: Créer `ContractActionsController.ts` et Définir les Méthodes de Base**
+- Date: 2025-06-06T17:05:41+00:00
+- Avancement: Terminé.
+- Actions:
+  - Création du fichier `ContractActionsController.ts` dans `src/modules/contracts/controllers/`.
+  - Injection de `ContractInteractionService` (et `ContractQueryService` commenté pour l'instant).
+  - Définition des squelettes de méthodes pour `pauseContract`, `unpauseContract`, et `mintTokens`.
+  - Application des décorateurs NestJS: `@Controller`, `@Post`, `@Param`, `@Body`, `@Req`, `@HttpCode`.
+  - Ajout d'un placeholder pour `@UseGuards(AuthGuard('jwt'))` au niveau du contrôleur.
+  - Vérification de l'existence de `userId` dans la requête.
+  - Création du fichier DTO `mint-request.dto.ts` dans `src/modules/contracts/dtos/` avec les validateurs `class-validator`.
+
+
+**L5-M2.3.2: Implémenter la Logique des Méthodes du Contrôleur**
+- Date: 2025-06-06T17:07:13+00:00
+- Avancement: Terminé.
+- Actions:
+  - Modification de `ContractActionsController.ts` pour implémenter la logique métier.
+  - Chaque méthode du contrôleur (`pauseContract`, `unpauseContract`, `mintTokens`) :
+    - Récupère `userId` depuis la requête (simulé pour l'instant).
+    - Appelle la méthode correspondante de `ContractInteractionService`.
+    - Injecte et utilise `ContractQueryService` pour des vérifications d'état préalables (ex: vérifier si déjà en pause/unpaused, ou si en pause avant de minter).
+    - Gère les exceptions des services et les transforme en réponses HTTP appropriées (`NotFoundException`, `BadRequestException`, etc.).
+    - Retourne une réponse structurée `ActionResponse { success, transactionHash?, message }`.
+
+
+**L5-M2.3.3: Mettre à Jour `ContractsModule`**
+- Date: 2025-06-06T17:15:26+00:00
+- Avancement: Terminé.
+- Actions:
+  - Ajout de `ContractActionsController` à la liste des `controllers` dans `src/modules/contracts/contracts.module.ts`.
+  - Vérification (implicite) que `ContractInteractionService` et `ContractQueryService` (fournis via `AppModule`) sont accessibles pour injection dans `ContractActionsController`.
+  - Noté pour plus tard : une meilleure modularité pourrait être obtenue en créant un `BlockchainCoreModule` pour les services blockchain au lieu de les mettre tous dans `AppModule`.
+
+
+**L5-M2.5.1: Tests Unitaires pour `ContractActionsController`**
+- Date: 2025-06-06T17:17:03+00:00
+- Avancement: Terminé.
+- Actions:
+  - Création du fichier de test unitaire `contract-actions.controller.spec.ts`.
+  - Moquage des dépendances: `ContractInteractionService` et `ContractQueryService`.
+  - Tests pour chaque action (`pause`, `unpause`, `mint`):
+    - Cas de succès avec vérification des appels aux services et de la réponse.
+    - Cas d'échec dus à des vérifications préalables (ex: contrat déjà en pause/unpaused, ou en pause avant mint).
+    - Cas d'échec dus à des exceptions relancées par les services (NotFound, Forbidden, etc.).
+    - Cas d'échec dus à une erreur interne du service (transformée en InternalServerErrorException).
+    - Cas où `userId` est manquant (simulant un échec de l'AuthGuard).
+
+
+**L5-M2.6.1: Mettre à Jour `API_DOCUMENTATION.md` (ERC-20 Actions)**
+- Date: 2025-06-06T17:18:03+00:00
+- Avancement: Terminé.
+- Actions:
+  - Ajout de la documentation pour les endpoints d'actions ERC-20 à `docs/api/API_DOCUMENTATION.md`:
+    - `POST /api/v1/contracts/:network/:address/erc20/pause`
+    - `POST /api/v1/contracts/:network/:address/erc20/unpause`
+    - `POST /api/v1/contracts/:network/:address/erc20/mint` (avec `MintRequestDto`).
+  - Chaque section détaille la méthode, le chemin, la description, l'authentification, les paramètres, le corps de la requête (si applicable), la réponse en cas de succès et les codes d'erreur possibles.
+
+
+**L5-M2.6.2: Mettre à Jour `devlog/LOT_5_LOG.md` (Finalisation L5-M2)**
+- Date: 2025-06-06T17:18:55+00:00
+- Avancement: Terminé.
+- Actions:
+  - Le `devlog/LOT_5_LOG.md` a été maintenu à jour tout au long de L5-M2.
+  - **FIN DE LA MILESTONE L5-M2: Dashboard - Actions Interactives Basiques (ERC-20).**
+
+
+**L5-M3.1: Conception des Endpoints API Backend (ERC-721 Actions)**
+- Date: 2025-06-06T17:20:05+00:00
+- Avancement: Terminé.
+- Actions de Conception:
+  - **Routes API Définies (ERC-721):**
+    - `POST /api/v1/contracts/:network/:address/erc721/pause` (Aucun payload)
+    - `POST /api/v1/contracts/:network/:address/erc721/unpause` (Aucun payload)
+    - `POST /api/v1/contracts/:network/:address/erc721/mint` (Payload: `NftMintRequestDto`)
+  - **DTO Défini (`NftMintRequestDto.ts` dans `src/modules/contracts/dtos/`):**
+    - `recipient`: string (IsEthereumAddress, IsNotEmpty)
+    - `tokenId`: string (IsString, IsNotEmpty, Matches /^[0-9]+$/)
+    - `tokenURI`: string (IsString, IsNotEmpty)
+  - **Structure de Réponse API en Cas de Succès:** Utilisation de la même structure `ActionResponse` que pour ERC-20.
+    ```json
+    {
+      success: true,
+      transactionHash: 0x...,
+      message: Action initiated successfully. Transaction hash: 0x...
+    }
+    ```
+  - Les erreurs utiliseront les codes HTTP standards.
+
+
+**L5-M3.2: Backend - Étendre `ContractInteractionService` (ERC-721 Actions)**
+- Date: 2025-06-06T17:22:15+00:00
+- Avancement: Terminé.
+- Actions:
+  - Ajout des méthodes `pauseERC721`, `unpauseERC721`, et `mintNFT` à `ContractInteractionService.ts` en utilisant un script Python pour l'injection de code.
+  - Logique similaire aux méthodes ERC-20 pour la gestion du signer et la vérification des droits via `DeploymentDataService`.
+  - La méthode `mintNFT` appelle `safeMintWithId(recipient, tokenId)` sur le contrat.
+  - Noté une clarification importante: le paramètre `tokenURI` du DTO `NftMintRequestDto` n'est pas utilisé par la fonction de mint du contrat `ERC721MVP.sol` actuel. Un avertissement est loggué dans le service.
