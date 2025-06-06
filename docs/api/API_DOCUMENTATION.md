@@ -244,3 +244,106 @@ Ce document fournit des exemples d'appels API et de réponses pour les endpoints
 6.  Préparation `DeploymentJobData`.
 7.  Ajout job à `deploymentQueue`.
 8.  Réponse `202 Accepted`.
+
+## NFT Simplified IPFS Upload
+
+### `POST /api/v1/nft/upload-ipfs`
+
+Uploads an NFT's image and metadata to IPFS, returning the `tokenURI`.
+
+**Request Type:** `multipart/form-data`
+
+**Form Fields:**
+
+*   `imageFile` (file, required): The image file for the NFT.
+    *   *Constraints*: Recommended max size 5MB. Supported types: common image formats (JPEG, PNG, GIF, SVG). (Actual validation for size/type can be configured in `NftIpfsController`'s `ParseFilePipe`).
+*   `name` (string, required): The name of the NFT.
+*   `description` (string, required): A description for the NFT.
+*   `attributes` (string, optional): A JSON string representing an array of attribute objects. Each object should have `trait_type` (string) and `value` (string).
+    *   *Example*: `[{"trait_type": "Color", "value": "Red"}, {"trait_type": "Power", "value": "Flight"}]`
+    *   *Note*: This field needs to be sent as a string when using `multipart/form-data`. The backend will parse it.
+
+**Example cURL Request:**
+
+```bash
+curl -X POST \
+  http://localhost:3000/api/v1/nft/upload-ipfs \
+  -H "Content-Type: multipart/form-data" \
+  -F "imageFile=@/path/to/your/nft_image.png" \
+  -F "name=My Awesome NFT" \
+  -F "description=This is a very special NFT." \
+  -F "attributes=[{\"trait_type\": \"Rarity\", \"value\": \"Legendary\"}]"
+```
+
+**Success Response (201 CREATED):**
+
+*   **Content-Type:** `application/json`
+
+**Response Body Fields:**
+
+*   `message` (string): Confirmation message (e.g., "NFT data and image uploaded successfully to IPFS!").
+*   `tokenURI` (string): The IPFS URI for the NFT's metadata JSON (e.g., `ipfs://QmMetadataHash...`). This is the URI that should be used when minting the NFT.
+*   `imageCID` (string): The Content Identifier (CID) of the uploaded image on IPFS (e.g., `QmImageHash...`).
+*   `metadataCID` (string): The Content Identifier (CID) of the uploaded metadata JSON on IPFS (e.g., `QmMetadataHash...`).
+*   `nftDetails` (object): The complete metadata object that was generated and pinned to IPFS.
+    *   `name` (string): Name of the NFT.
+    *   `description` (string): Description of the NFT.
+    *   `image` (string): IPFS URI for the image (e.g., `ipfs://QmImageHash...`).
+    *   `attributes` (array): Array of attribute objects.
+
+**Example Success Response Body:**
+
+```json
+{
+  "message": "NFT data and image uploaded successfully to IPFS!",
+  "tokenURI": "ipfs://QmMetadataHashForNft",
+  "imageCID": "QmImageHashForNft",
+  "metadataCID": "QmMetadataHashForNft",
+  "nftDetails": {
+    "name": "My Awesome NFT",
+    "description": "This is a very special NFT.",
+    "image": "ipfs://QmImageHashForNft",
+    "attributes": [
+      { "trait_type": "Rarity", "value": "Legendary" }
+    ]
+  }
+}
+```
+
+**Error Responses:**
+
+*   `400 Bad Request`:
+    *   If required fields are missing (e.g., `imageFile`, `name`, `description`).
+    *   If validation fails for any field (e.g., `name` is not a string, `attributes` is malformed JSON).
+    *   If the `imageFile` fails validation (e.g., too large, wrong file type - if validators are active).
+    *   *Example Body:*
+        ```json
+        {
+          "statusCode": 400,
+          "message": [
+            "name should not be empty",
+            "description should not be empty"
+          ],
+          "error": "Bad Request"
+        }
+        ```
+        ```json
+        {
+          "message": "Image file is required."
+        }
+        ```
+*   `500 Internal Server Error`:
+    *   If there's an issue with the IPFS pinning service (e.g., Pinata API error).
+    *   Any other unexpected server-side error.
+    *   *Example Body:*
+        ```json
+        {
+          "message": "Failed to upload file to IPFS: Pinata Error",
+          "error": "Internal Server Error"
+        }
+        ```
+        ```json
+        {
+          "message": "An unexpected error occurred during NFT upload."
+        }
+        ```
