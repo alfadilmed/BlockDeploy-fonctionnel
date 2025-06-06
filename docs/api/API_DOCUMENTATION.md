@@ -147,3 +147,45 @@ Ce document fournit des exemples d'appels API et de réponses pour les endpoints
     *   Récupère `ownerAddress` (ex: de `DeploymentDBSchema.deployerAddress`). Appelle `balanceOf(ownerAddress)`.
     *   Gère erreurs on-chain.
 4.  Formate réponse. Cache optionnel (TTL court).
+---
+### 5. Gérer les Rôles d'un Contrat ERC-20 Advanced (Ex: `MINTER_ROLE`) (Lot 4 - Optionnel L4-M2.2)
+
+*   **Endpoint:** `POST /api/v1/contracts/:networkName/:contractAddress/erc20/roles`
+*   **Méthode:** `POST`
+*   **Description:** Permet à l'admin (`DEFAULT_ADMIN_ROLE`) d'un `ERC20Advanced` d'accorder/révoquer des rôles (ex: `MINTER_ROLE`). Actions traitées via file d'attente ou retour de Tx non signées.
+*   **Authentification:** Requise (utilisateur doit être admin du contrat).
+*   **Paramètres d'URL:** `networkName`, `contractAddress`.
+*   **Corps de la Requête:**
+    ```json
+    {
+      "role": "minter", // "minter", "pauser" (si géré par rôle)
+      "grant": ["0xADDRESS_TO_GRANT_1"],
+      "revoke": ["0xADDRESS_TO_REVOKE_1"]
+    }
+    ```
+    *   `role` (string, requis): Rôle à gérer.
+    *   `grant` (array de strings, optionnel): Adresses à qui accorder le rôle.
+    *   `revoke` (array de strings, optionnel): Adresses de qui révoquer le rôle.
+*   **Réponse Succès (`202 Accepted` si via queue, ou `200 OK` si Tx non signée retournée):**
+    ```json
+    // Si via queue:
+    {
+      "message": "Demande de modification de rôle(s) acceptée et mise en file d'attente.",
+      "roleManagementId": "role-modif-id-abc-123",
+      "jobId": "131415"
+    }
+    // Si Tx non signée retournée (pour chaque action grant/revoke):
+    // {
+    //   "message": "Transaction(s) préparée(s) pour modification de rôle. Veuillez signer.",
+    //   "unsignedTransactions": [
+    //     { "type": "grant", "account": "0x...", "role": "minter", "unsignedTx": { "to": "0x...", "data": "0x..." } }
+    //   ]
+    // }
+    ```
+*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`.
+
+**Logique Backend (Conceptuel):**
+1.  Validation & Autorisation.
+2.  Pour chaque action grant/revoke:
+    *   **Option A (Queue):** Préparer `RoleManagementJobData`, ajouter à une queue. Worker exécute.
+    *   **Option B (Tx Non Signée - Préférable pour actions admin):** Préparer la transaction non signée pour `grantRole()` ou `revokeRole()`. Retourner au client pour signature.

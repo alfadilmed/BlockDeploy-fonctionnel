@@ -25,7 +25,7 @@ Ce guide vous mènera à travers chaque étape du formulaire de création.
 
 Le monde de la blockchain a son propre jargon. Si vous rencontrez des termes que vous ne comprenez pas, notre glossaire est là pour vous aider !
 
-*   ➡️ **[Consulter le Glossaire Web3 (Lien vers le futur fichier GLOSSARY.md)]**
+*   ➡️ **[Consulter le Glossaire Web3 (GLOSSARY.md)]**
 
 ## 4. Questions Fréquemment Posées (FAQ pour Débutants)
 

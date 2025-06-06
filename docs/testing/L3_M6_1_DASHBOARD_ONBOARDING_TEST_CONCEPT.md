@@ -1,0 +1,49 @@
+## L3-M6.1: Concept de Tests pour Dashboard MVP & Onboarding Initial (Lot 3)
+
+**Objectif:** Décrire les scénarios de test conceptuels pour valider les fonctionnalités du Dashboard MVP et de l'Onboarding Initial.
+
+### 1. Prérequis Généraux (Conceptuels)
+*   Utilisateur de test authentifié.
+*   Plusieurs contrats ERC-20 MVP déployés (conceptuellement) par l'utilisateur (statuts variés, réseaux variés).
+*   APIs Backend du Lot 3 fonctionnelles (conceptuellement).
+
+### 2. Scénarios de Test pour le Dashboard MVP
+
+**a. Page "Mes Contrats" (`/dashboard/my-contracts`) - L3-M2.1**
+*   **TST-DASH-LC-001:** Affichage liste contrats (infos clés, pagination).
+*   **TST-DASH-LC-002:** Filtre par Réseau.
+*   **TST-DASH-LC-003:** Filtre par Statut.
+*   **TST-DASH-LC-004:** Combinaison Filtres.
+*   **TST-DASH-LC-005:** Recherche (nom projet/adresse).
+*   **TST-DASH-LC-006:** Liens Explorateur de Blocs.
+*   **TST-DASH-LC-007:** Navigation vers Page Détail.
+*   **TST-DASH-LC-008:** État "Aucun Contrat".
+
+**b. Page "Détail Contrat" (`/dashboard/deployment/:deploymentId`) - L3-M2.2**
+*   **TST-DASH-DC-001:** Affichage Infos Générales Déploiement (pour statut `success`).
+*   **TST-DASH-DC-002:** Affichage Configuration Initiale (ERC-20 MVP).
+*   **TST-DASH-DC-003:** Affichage Données On-Chain (ERC-20 MVP, si `success`).
+*   **TST-DASH-DC-004:** Comportement "Rafraîchir" Données On-Chain.
+*   **TST-DASH-DC-005:** Affichage pour Déploiement `failed` (message erreur).
+*   **TST-DASH-DC-006:** Affichage pour Déploiement `pending/processing`.
+
+**c. Actions sur Contrat (Pause/Unpause - si L3-M5 implémenté)**
+*   **TST-DASH-ACT-001:** Visibilité conditionnelle des boutons.
+*   **TST-DASH-ACT-002:** Action "Mettre en Pause" (appel API, signature simulée, feedback UI, màj état).
+*   **TST-DASH-ACT-003:** Action "Reprendre les Transferts".
+
+### 3. Scénarios de Test pour l'Onboarding Initial
+
+**a. Info-Bulles (Tooltips) sur Formulaire ERC-20 MVP (L3-M3.1)**
+*   **TST-ONB-TT-001:** Présence et contenu correct des tooltips pour chaque champ cible.
+*   **TST-ONB-TT-002:** Comportement responsif des tooltips.
+
+**b. Page "Aide / Premiers Pas" (L3-M3.2)**
+*   **TST-ONB-HP-001:** Accès et contenu de la page conforme à la doc.
+*   **TST-ONB-HP-002:** Fonctionnalité des liens (vers guides, glossaire).
+
+**c. Page Glossaire Web3 (L3-M4.1)**
+*   **TST-ONB-GL-001:** Accès et contenu du glossaire conforme à la doc.
+*   **TST-ONB-GL-002:** Lisibilité et structure.
+
+Ces tests conceptuels visent à assurer l'intégration et l'UX des fonctionnalités du Lot 3.

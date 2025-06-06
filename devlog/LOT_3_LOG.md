@@ -21,18 +21,26 @@
     *   Documentation (`docs/ui_ux/L3_M3_1_TOOLTIP_IMPLEMENTATION.md`).
 *   **L3-M3.2: Création de la page "Aide / Premiers Pas" (Lot 3) (TERMINÉ)**
     *   Création du fichier Markdown statique `docs/user_guides/GETTING_STARTED.md`.
-    *   Contenu initial incluant: bienvenue, prérequis wallet, lien vers guide ERC-20, lien vers glossaire, FAQ de base.
+*   **L3-M4.1: Intégration de la page Glossaire Web3 (Lot 3) (TERMINÉ)**
+    *   Création du fichier Markdown statique `docs/user_guides/GLOSSARY.md`.
+    *   Mise à jour du lien dans `GETTING_STARTED.md`.
+*   **L3-M5 (Opt.): Actions de Base sur Contrat (Lot 3) - Documentation conceptuelle (TERMINÉ)**
+    *   Documentation (`docs/dashboard_actions/L3_M5_BASIC_CONTRACT_ACTIONS.md`).
+*   **L3-M6.1: Tests (conceptuels) Dashboard & Onboarding (Lot 3) (TERMINÉ)**
+    *   Documentation (`docs/testing/L3_M6_1_DASHBOARD_ONBOARDING_TEST_CONCEPT.md`).
+*   **L3-M6.2: Mise à jour de la documentation utilisateur (Lot 3) (TERMINÉ)**
+    *   Identification des mises à jour/créations de guides pour le Dashboard et l'Onboarding.
+    *   Fichier `docs/user_guides/L3_M6_2_USER_DOC_UPDATES_LOT3.md` créé.
 
 ### En Cours ⏳
 *   Aucun.
 
 ### Prochaines Étapes 🚀
-*   **L3-M4.1:** Intégration de la page Glossaire Web3 (statique Markdown).
-*   **L3-M5 (Opt.):** Actions de Base sur Contrat depuis Dashboard.
-*   **L3-M6.1:** Tests (conceptuels) Dashboard & Onboarding.
+*   Présenter le Lot 3 comme complété (conceptuellement).
+*   Attendre le feedback utilisateur pour la planification et l'exécution du Lot 4 (Amélioration ERC-20 & NFT MVP ERC-721 - si on suit le plan consolidé initial).
 
 ### Blocages  блокировка
 *   Aucun pour le moment.
 EOF
 
-echo "devlog/LOT_3_LOG.md mis à jour pour L3-M3.2."
+echo "devlog/LOT_3_LOG.md mis à jour pour L3-M6.2. Lot 3 conceptuellement terminé."
