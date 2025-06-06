@@ -117,3 +117,28 @@ L'intégration de la file d'attente pour le déploiement des contrats ERC-20 MVP
 *   Le worker met à jour l'enregistrement `DeploymentDBSchema` avec le résultat.
 
 Cette approche maintient la logique de transformation de la configuration spécifique au type de contrat (ERC-20 MVP) dans le producer (service API), gardant le `DeploymentService` et le worker plus génériques.
+---
+### 4. Cas Spécifique: Déploiement d'un NFT ERC-721 MVP (Lot 4 - L4-M5.2)
+
+L'intégration de la file d'attente pour les NFT ERC-721 MVP (Option 1: URL métadonnées externe) suit les principes établis.
+
+**a. Endpoint API (`POST /api/v1/deploy/nft-erc721-mvp`) - Producer Logic:**
+
+1.  **Réception Configuration:** API reçoit `collectionConfig` (nom, symbole, `baseTokenURI`, royalties, features, `initialOwner`).
+2.  **Validation & Préparation:**
+    *   Valider `collectionConfig`. Récupérer `userId`.
+    *   **Sélection Template:** Utiliser `templateKey`: "ERC721MVP_Std_RoyaltyPausBurn_v1".
+    *   **Formatage `constructorArgs`:** Pour `ERC721MVP.sol` à partir de `collectionConfig`:
+        `[name, symbol, ownerAddress, baseTokenURI, royalties.receiver, royalties.fractionBps]`
+3.  **Création `DeploymentDBSchema`:** `status: PENDING`, `contractType: "NFT_ERC721"`, `configuration` (stocke `collectionConfig`), `templateKeyUsed`.
+4.  **Préparation `DeploymentJobData`:**
+    *   `deploymentId`, `userId`, `networkName`, `contractType: "NFT_ERC721"`.
+    *   `contractNameForPrecompiled`: "ERC721MVP_Std_RoyaltyPausBurn_v1".
+    *   `constructorArgs`: Arguments formatés.
+5.  **Ajout à `deploymentQueue`**.
+6.  **Réponse API:** `202 Accepted`.
+
+**b. `deploymentWorker` - Consumer Logic:**
+*   Worker récupère job. `jobData.contractType` ("NFT_ERC721") et `jobData.contractNameForPrecompiled` guident le traitement.
+*   Appel à `deploymentService.deployPrecompiledContract()` avec ABI/bytecode du template "ERC721MVP_Std_RoyaltyPausBurn_v1" et `constructorArgs` du job.
+*   Mise à jour `DeploymentDBSchema` (succès/échec) identique au flux ERC-20.

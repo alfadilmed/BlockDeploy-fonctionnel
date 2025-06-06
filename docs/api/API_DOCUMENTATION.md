@@ -189,3 +189,58 @@ Ce document fournit des exemples d'appels API et de réponses pour les endpoints
 2.  Pour chaque action grant/revoke:
     *   **Option A (Queue):** Préparer `RoleManagementJobData`, ajouter à une queue. Worker exécute.
     *   **Option B (Tx Non Signée - Préférable pour actions admin):** Préparer la transaction non signée pour `grantRole()` ou `revokeRole()`. Retourner au client pour signature.
+---
+### 6. Déployer un contrat NFT ERC-721 MVP (Option 1: URL Métadonnées Externe) (Lot 4 - L4-M5.1)
+
+*   **Endpoint:** `POST /api/v1/deploy/nft-erc721-mvp`
+*   **Méthode:** `POST`
+*   **Description:** Initie le déploiement d'un contrat NFT ERC-721 MVP. L'utilisateur fournit une `baseTokenURI` pour les métadonnées.
+*   **Authentification:** Requise.
+*   **Corps de la Requête:**
+    ```json
+    {
+      "networkName": "polygon_mumbai",
+      "userGivenName": "Ma Première Collection NFT",
+      "collectionConfig": {
+        "name": "Les Aventuriers du Web3",
+        "symbol": "ADW3",
+        "baseTokenURI": "ipfs://QmZz...aBcD/metadata/",
+        "royalties": {
+          "receiver": "0xRoyaltyCollectorAddress...",
+          "fractionBps": 750
+        },
+        "features": {
+          "pausable": true
+        },
+        "initialOwner": "0xUserWalletAddress..."
+      }
+    }
+    ```
+    *   `networkName` (string, requis).
+    *   `userGivenName` (string, optionnel).
+    *   `collectionConfig` (object, requis):
+        *   `name`, `symbol` (string, requis).
+        *   `baseTokenURI` (string, requis).
+        *   `royalties.receiver` (address, requis).
+        *   `royalties.fractionBps` (number, requis, 0-10000).
+        *   `features.pausable` (boolean, optionnel, défaut `true`).
+        *   `initialOwner` (address, optionnel, défaut `userId`).
+*   **Réponse Succès (`202 Accepted`):**
+    ```json
+    {
+      "message": "Demande de déploiement pour la collection NFT ERC-721 MVP acceptée et mise en file d'attente.",
+      "deploymentId": "nft-deployment-id-123-abc",
+      "jobId": "202122"
+    }
+    ```
+*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `500 Internal Server Error`.
+
+**Logique Backend (Conceptuel):**
+1.  Validation requête & `collectionConfig`.
+2.  Récupération `userId` (pour `initialOwner` si non fourni).
+3.  Création entrée `DeploymentDBSchema` (`status: PENDING`, `contractType: "NFT_ERC721"`).
+4.  Sélection Template: "ERC721MVP_Std_RoyaltyPausBurn_v1".
+5.  Préparation `constructorArgs` pour `ERC721MVP.sol`.
+6.  Préparation `DeploymentJobData`.
+7.  Ajout job à `deploymentQueue`.
+8.  Réponse `202 Accepted`.
