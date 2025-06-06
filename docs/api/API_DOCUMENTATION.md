@@ -347,3 +347,90 @@ curl -X POST \
           "message": "An unexpected error occurred during NFT upload."
         }
         ```
+
+---
+
+## Get Enriched Contract Details
+
+### `GET /api/v1/contracts/:network/:address/details`
+
+Retrieves detailed information about a deployed smart contract, combining data stored by BlockDeploy (database) with live on-chain data.
+
+**Authentication:** Requires Bearer Token. The user must be authenticated and have permission to view the specified contract (e.g., be its owner/deployer).
+
+**Path Parameters:**
+
+*   `network` (string, required): The network where the contract is deployed (e.g., "sepolia", "polygon", "mainnet").
+*   `address` (string, required): The Ethereum address of the smart contract.
+
+**Success Response (200 OK):**
+
+*   **Content-Type:** `application/json`
+
+**Response Body (`ContractDetailsResponseDto`):**
+
+*   `databaseInfo` (object): Information about the contract stored in BlockDeploy's database.
+    *   `deploymentId` (string): Internal ID of the deployment.
+    *   `userId` (string): ID of the user who deployed/owns the contract.
+    *   `userGivenName` (string): The name given to the contract by the user during setup.
+    *   `contractType` (string): Type of the contract (e.g., "ERC20MVP", "ERC20Advanced", "ERC721MVP").
+    *   `deployedAt` (string ISO Date): Timestamp of when the contract was deployed.
+    *   `network` (string): Network of deployment.
+    *   `address` (string): Contract address.
+    *   `isPausable` (boolean, optional): Indicates if the contract was configured to be pausable.
+    *   `isCapped` (boolean, optional): Indicates if an ERC-20 contract was configured with a cap.
+    *   `capValue` (string, optional): The cap value if `isCapped` is true.
+    *   `defaultRoyaltyReceiver` (string, optional): For ERC-721, the default royalty receiver address (if set).
+    *   `defaultRoyaltyFractionBps` (number, optional): For ERC-721, the default royalty fraction in basis points (e.g., 500 for 5%).
+*   `onChainData` (object): Data read directly from the blockchain. Fields may be `null` if not applicable or if an error occurred during fetching a specific piece of data.
+    *   `name` (string | null): The name of the token/collection as read from the contract.
+    *   `symbol` (string | null): The symbol of the token/collection as read from the contract.
+    *   `decimals` (number | null): For ERC-20, the number of decimals.
+    *   `totalSupply` (string | null): For ERC-20, the total supply (as a string to handle large numbers).
+    *   `isPaused` (boolean | null): If the contract is pausable, indicates its current paused state.
+    *   `cap` (string | null): For capped ERC-20, the maximum supply (as a string).
+    *   `supportsEIP2981` (boolean | null): For ERC-721, indicates if the EIP-2981 royalty standard is supported.
+*   `blockExplorerUrl` (string, optional): A direct URL to view the contract on a relevant block explorer.
+
+**Example Success Response Body:**
+
+```json
+{
+  "databaseInfo": {
+    "deploymentId": "mock-erc20-adv-001",
+    "userId": "user-123",
+    "userGivenName": "My Advanced Token",
+    "contractType": "ERC20Advanced",
+    "deployedAt": "2023-11-15T10:30:00.000Z",
+    "network": "sepolia",
+    "address": "0x1234567890123456789012345678901234567890",
+    "isPausable": true,
+    "isCapped": true,
+    "capValue": "2000000000000000000000000"
+  },
+  "onChainData": {
+    "name": "OnChain Advanced Token",
+    "symbol": "OCAT",
+    "decimals": 18,
+    "totalSupply": "1000000000000000000000",
+    "isPaused": false,
+    "cap": "2000000000000000000000000"
+  },
+  "blockExplorerUrl": "https://sepolia.etherscan.io/address/0x1234567890123456789012345678901234567890"
+}
+```
+
+**Error Responses:**
+
+*   `401 Unauthorized`: If the request lacks valid authentication credentials.
+*   `403 Forbidden`: If the authenticated user does not have permission to view the contract details (e.g., not the owner).
+*   `404 Not Found`: If no contract is found at the specified `address` on the given `network`, or if the user does not have access to it.
+    *   *Example Body:*
+        ```json
+        {
+          "statusCode": 404,
+          "message": "Contract not found or access denied at 0x123... on sepolia.",
+          "error": "Not Found"
+        }
+        ```
+*   `500 Internal Server Error`: For unexpected server-side errors, including issues fetching data from the blockchain if not gracefully handled to return partial data.
