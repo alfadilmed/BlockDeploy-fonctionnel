@@ -19,15 +19,25 @@ Le moyen le plus simple de commencer est de déployer un token ERC-20 personnali
 
 *   ➡️ **[Guide Complet : Déployer votre Token ERC-20 Personnalisé (Lien vers le futur guide utilisateur documenté en L2-M5.2)]**
 
+## 3. Créer Votre Premier NFT (Nouveau)
+
+En plus des tokens fongibles comme les ERC-20, BlockDeploy vous permet de créer facilement des Tokens Non Fongibles (NFTs) uniques. Les NFTs peuvent représenter des œuvres d'art numériques, des objets de collection, des certificats, et bien plus encore.
+
+Avec notre nouvelle fonctionnalité d'upload simplifié vers IPFS, la gestion des métadonnées et de l'image de votre NFT est grandement facilitée.
+
+*   ➡️ **[Guide Complet : Créer votre NFT avec Upload IPFS Simplifié (Lien vers le nouveau guide L4-M8.2.2)]**
+
+Ce guide vous expliquera comment préparer vos informations, uploader votre média, et obtenir un tokenURI prêt à être utilisé pour minter votre NFT.
+
 Ce guide vous mènera à travers chaque étape du formulaire de création.
 
-## 3. Comprendre le Langage Web3 : Notre Glossaire
+## 4. Comprendre le Langage Web3
 
 Le monde de la blockchain a son propre jargon. Si vous rencontrez des termes que vous ne comprenez pas, notre glossaire est là pour vous aider !
 
 *   ➡️ **[Consulter le Glossaire Web3 (GLOSSARY.md)]**
 
-## 4. Questions Fréquemment Posées (FAQ pour Débutants)
+## 5. Questions Fréquemment Posées
 
 *   **Q: Qu'est-ce que le "gas" ou les "frais de réseau" ?**
     *   R: Le gas est une petite quantité de la cryptomonnaie native d'une blockchain (comme l'ETH pour Ethereum ou MATIC pour Polygon) que vous payez pour effectuer des opérations sur le réseau, comme déployer un contrat ou transférer des tokens. Ces frais rémunèrent les validateurs qui sécurisent le réseau. BlockDeploy vous donnera une estimation de ces frais avant chaque déploiement.
