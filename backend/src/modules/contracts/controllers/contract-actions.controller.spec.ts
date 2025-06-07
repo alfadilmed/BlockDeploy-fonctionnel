@@ -3,6 +3,7 @@ import { ContractActionsController, ActionResponse } from './contract-actions.co
 import { ContractInteractionService } from '../../../services/blockchain/contract-interaction.service';
 import { ContractQueryService } from '../../../services/blockchain/contract-query.service';
 import { MintRequestDto } from '../dtos/mint-request.dto';
+import { NftMintRequestDto } from '../dtos/nft-mint-request.dto';
 import {
   NotFoundException,
   ForbiddenException,
@@ -162,4 +163,127 @@ describe('ContractActionsController', () => {
     // Les tests ici se concentrent sur la logique du contrôleur après validation.
     // ... autres tests d'erreur similaires à pause ...
   });
+
+  // --- Tests pour PAUSE ERC721 ---
+  describe('pauseContractERC721', () => {
+    const network = 'sepolia';
+    const address = '0xerc721pause';
+    const expectedTxHash = '0xPauseHashERC721';
+
+    it('should successfully pause an ERC721 contract', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(false);
+      mockContractInteractionService.pauseERC721.mockResolvedValue({ transactionHash: expectedTxHash });
+
+      const result: ActionResponse = await controller.pauseContractERC721(network, address, mockReq as any);
+
+      expect(mockContractQueryService.isPaused).toHaveBeenCalledWith(network, address);
+      expect(interactionService.pauseERC721).toHaveBeenCalledWith(network, address, mockUser.id);
+      expect(result.success).toBe(true);
+      expect(result.transactionHash).toEqual(expectedTxHash);
+      expect(result.message).toContain('ERC721 Pause action initiated successfully');
+    });
+
+    it('should throw BadRequestException if ERC721 contract is already paused', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(true);
+
+      await expect(controller.pauseContractERC721(network, address, mockReq as any))
+        .rejects.toThrow(new BadRequestException(\`Contract \${address} is already paused.\`));
+      expect(interactionService.pauseERC721).not.toHaveBeenCalled();
+    });
+
+    it('should re-throw known exceptions from interaction service for pauseERC721', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(false);
+      mockContractInteractionService.pauseERC721.mockRejectedValue(new ForbiddenException('User forbidden to pause ERC721'));
+
+      await expect(controller.pauseContractERC721(network, address, mockReq as any))
+        .rejects.toThrow(ForbiddenException);
+    });
+
+    it('should throw InternalServerErrorException for unknown errors from interaction service for pauseERC721', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(false);
+      mockContractInteractionService.pauseERC721.mockRejectedValue(new Error('Some other ERC721 pause error'));
+
+      await expect(controller.pauseContractERC721(network, address, mockReq as any))
+        .rejects.toThrow(InternalServerErrorException);
+    });
+  });
+
+  // --- Tests pour UNPAUSE ERC721 ---
+  describe('unpauseContractERC721', () => {
+    const network = 'sepolia';
+    const address = '0xerc721unpause';
+    const expectedTxHash = '0xUnpauseHashERC721';
+
+    it('should successfully unpause an ERC721 contract', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(true);
+      mockContractInteractionService.unpauseERC721.mockResolvedValue({ transactionHash: expectedTxHash });
+
+      const result: ActionResponse = await controller.unpauseContractERC721(network, address, mockReq as any);
+
+      expect(queryService.isPaused).toHaveBeenCalledWith(network, address);
+      expect(interactionService.unpauseERC721).toHaveBeenCalledWith(network, address, mockUser.id);
+      expect(result.success).toBe(true);
+      expect(result.transactionHash).toEqual(expectedTxHash);
+      expect(result.message).toContain('ERC721 Unpause action initiated successfully');
+    });
+
+    it('should throw BadRequestException if ERC721 contract is already unpaused', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(false);
+
+      await expect(controller.unpauseContractERC721(network, address, mockReq as any))
+        .rejects.toThrow(new BadRequestException(\`Contract \${address} is already unpaused (not paused).\`));
+      expect(interactionService.unpauseERC721).not.toHaveBeenCalled();
+    });
+  });
+
+  // --- Tests pour MINT NFT (ERC721) ---
+  describe('mintNFT', () => {
+    const network = 'sepolia';
+    const address = '0xerc721mint';
+    const nftMintDto: NftMintRequestDto = { recipient: '0xNftRecipient', tokenId: '1', tokenURI: 'ipfs://cid' };
+    const expectedTxHash = '0xMintHashERC721';
+
+    it('should successfully mint an NFT', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(false);
+      mockContractInteractionService.mintNFT.mockResolvedValue({ transactionHash: expectedTxHash });
+
+      const result: ActionResponse = await controller.mintNFT(network, address, nftMintDto, mockReq as any);
+
+      expect(queryService.isPaused).toHaveBeenCalledWith(network, address);
+      expect(interactionService.mintNFT).toHaveBeenCalledWith(network, address, nftMintDto.recipient, nftMintDto.tokenId, nftMintDto.tokenURI, mockUser.id);
+      expect(result.success).toBe(true);
+      expect(result.transactionHash).toEqual(expectedTxHash);
+      expect(result.message).toContain('NFT Mint action initiated successfully');
+    });
+
+    it('should throw BadRequestException if ERC721 contract is paused before minting', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(true);
+
+      await expect(controller.mintNFT(network, address, nftMintDto, mockReq as any))
+        .rejects.toThrow(new BadRequestException(\`Cannot mint NFT: contract \${address} is currently paused.\`));
+      expect(interactionService.mintNFT).not.toHaveBeenCalled();
+    });
+
+    it('should re-throw known exceptions from interaction service for mintNFT', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(false);
+      mockContractInteractionService.mintNFT.mockRejectedValue(new NotFoundException('Contract not found by service for mintNFT'));
+
+      await expect(controller.mintNFT(network, address, nftMintDto, mockReq as any))
+        .rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw InternalServerErrorException for unknown errors from interaction service for mintNFT', async () => {
+      mockContractQueryService.isPaused.mockResolvedValue(false);
+      mockContractInteractionService.mintNFT.mockRejectedValue(new Error('Some other ERC721 mint error'));
+
+      await expect(controller.mintNFT(network, address, nftMintDto, mockReq as any))
+        .rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should throw InternalServerErrorException if userId is missing for mintNFT (simulating AuthGuard failure)', async () => {
+      await expect(controller.mintNFT(network, address, nftMintDto, { user: undefined } as any))
+        .rejects.toThrow(new InternalServerErrorException('Authentication error: User ID missing.'));
+    });
+  });
+
 });

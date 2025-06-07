@@ -17,6 +17,7 @@ import { ContractInteractionService } from '../../../services/blockchain/contrac
 import { ContractQueryService } from '../../../services/blockchain/contract-query.service'; // Pour les vérifications d'état préalables
 // import { AuthGuard } from '@nestjs/passport'; // Supposons un AuthGuard global
 import { MintRequestDto } from '../dtos/mint-request.dto';
+import { NftMintRequestDto } from '../dtos/nft-mint-request.dto';
 
 // Placeholder pour AuthGuard si non global
 const AuthGuard = (strategy: string) => UseGuards();
@@ -173,4 +174,6 @@ export class ContractActionsController {
       throw new InternalServerErrorException(error.message || 'Failed to initiate mint action.');
     }
   }
+
+
 }

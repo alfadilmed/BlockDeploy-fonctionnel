@@ -288,3 +288,134 @@
   - Logique similaire aux méthodes ERC-20 pour la gestion du signer et la vérification des droits via `DeploymentDataService`.
   - La méthode `mintNFT` appelle `safeMintWithId(recipient, tokenId)` sur le contrat.
   - Noté une clarification importante: le paramètre `tokenURI` du DTO `NftMintRequestDto` n'est pas utilisé par la fonction de mint du contrat `ERC721MVP.sol` actuel. Un avertissement est loggué dans le service.
+
+
+**L5-M3.3.1: Étendre `ContractActionsController.ts` pour les Actions ERC-721**
+- Date: 2025-06-06T17:25:26+00:00
+- Avancement: Terminé.
+- Actions:
+  - Ajout des méthodes pour `/erc721/pause`, `/erc721/unpause`, et `/erc721/mint` à `ContractActionsController.ts`.
+  - Logique similaire aux méthodes ERC-20 : récupération `userId`, appel à `ContractInteractionService` et `ContractQueryService` pour pré-vérifications.
+  - Utilisation de `NftMintRequestDto` pour la validation du payload de mint NFT.
+  - Assuré que le DTO `NftMintRequestDto.ts` est créé dans `src/modules/contracts/dtos/`.
+  - Gestion des erreurs et retour de la structure `ActionResponse`.
+
+
+**L5-M3.5.1: Tests Unitaires pour les Nouvelles Méthodes de `ContractActionsController` (ERC-721)**
+- Date: 2025-06-06T17:27:38+00:00
+- Avancement: Terminé.
+- Actions:
+  - Étendu le fichier de test unitaire `contract-actions.controller.spec.ts`.
+  - Ajout de blocs `describe` pour `pauseContractERC721`, `unpauseContractERC721`, et `mintNFT`.
+  - Tests incluent les cas de succès, les échecs de préconditions (contrat déjà dans l'état cible, en pause avant mint), les exceptions de service (NotFound, Forbidden, InternalServerError), et l'absence de `userId`.
+  - Assuré l'import de `NftMintRequestDto` dans le fichier de test.
+
+
+**L5-M3.5.1: Tests Unitaires pour les Nouvelles Méthodes de `ContractActionsController` (ERC-721)**
+- Date: 2025-06-06T17:28:36+00:00
+- Avancement: Terminé.
+- Actions:
+  - Étendu le fichier de test unitaire `contract-actions.controller.spec.ts`.
+  - Ajout de blocs `describe` pour `pauseContractERC721`, `unpauseContractERC721`, et `mintNFT`.
+  - Tests incluent les cas de succès, les échecs de préconditions (contrat déjà dans l'état cible, en pause avant mint), les exceptions de service (NotFound, Forbidden, InternalServerError), et l'absence de `userId`.
+  - Assuré l'import de `NftMintRequestDto` dans le fichier de test.
+
+
+**L5-M3.5.2: Tests Unitaires pour les Nouvelles Méthodes de `ContractInteractionService` (ERC-721)**
+- Date: 2025-06-06T17:30:16+00:00
+- Avancement: Terminé.
+- Actions:
+  - Création/Extension du fichier de test unitaire `contract-interaction.service.spec.ts`.
+  - Ajout de blocs `describe` pour `pauseERC721`, `unpauseERC721`, et `mintNFT`.
+  - Tests incluent les cas de succès, les échecs de validation (ex: adresse/tokenId invalide pour mint), les échecs de permission (contrat non pausable), et les erreurs de transaction blockchain.
+  - Moquage des dépendances (`ProviderService`, `DeploymentDataService`, `ethers.Contract`).
+
+
+**L5-M3.6.1: Mettre à Jour `API_DOCUMENTATION.md` (ERC-721 Actions)**
+- Date: 2025-06-07T15:35:16+00:00
+- Avancement: Terminé.
+- Actions:
+  - Ajout de la documentation pour les endpoints d'actions ERC-721 à `docs/api/API_DOCUMENTATION.md`:
+    - `POST /api/v1/contracts/:network/:address/erc721/pause`
+    - `POST /api/v1/contracts/:network/:address/erc721/unpause`
+    - `POST /api/v1/contracts/:network/:address/erc721/mint` (avec `NftMintRequestDto`).
+  - Clarification dans la documentation du mint ERC-721 concernant l'utilisation du paramètre `tokenURI` avec le contrat `ERC721MVP.sol` actuel.
+
+
+**L5-M3.6.2: Mettre à Jour `devlog/LOT_5_LOG.md` (Finalisation L5-M3)**
+- Date: 2025-06-07T15:36:23+00:00
+- Avancement: Terminé.
+- Actions:
+  - Le `devlog/LOT_5_LOG.md` a été maintenu à jour tout au long de L5-M3.
+  - Correction d'une scorie mineure (mot 'христианство') dans `API_DOCUMENTATION.md`.
+  - **FIN DE LA MILESTONE L5-M3: Dashboard - Actions Interactives Basiques (ERC-721).**
+
+
+**L5-M3.6.2: Mettre à Jour `devlog/LOT_5_LOG.md` (Finalisation L5-M3)**
+- Date: 2025-06-07T15:38:21+00:00
+- Avancement: Terminé.
+- Actions:
+  - Le `devlog/LOT_5_LOG.md` a été maintenu à jour tout au long de L5-M3.
+  - Correction d'une scorie mineure (mot 'христианство') dans `API_DOCUMENTATION.md`.
+  - **FIN DE LA MILESTONE L5-M3: Dashboard - Actions Interactives Basiques (ERC-721).**
+
+
+**L5-M4.1: Conception Détaillée de la Checklist et de son Contenu**
+- Date: 2025-06-07T15:39:49+00:00
+- Avancement: Terminé.
+- Actions de Conception:
+  - Titre Provisoire de la Checklist: Vos Premiers Pas sur BlockDeploy ou Bien Démarrer avec BlockDeploy.
+  - Liste des Items de la Checklist (6 items) finalisée avec textes exacts, actions utilisateur, et suggestions de liens pertinents:
+    1.  **Connexion du Portefeuille:** Texte défini, action = connexion wallet, détection auto.
+    2.  **Comprendre les Réseaux de Test:** Texte défini, action = lecture/clic lien, détection manuelle, lien vers `#/mini-academy/obtaining-testnet-tokens`.
+    3.  **Premier Déploiement ERC-20:** Texte défini, action = déploiement ERC-20, détection auto (idéalement), lien vers `#/deploy/erc20`.
+    4.  **Explorer votre Contrat:** Texte défini, action = visite explorateur via dashboard, détection manuelle (ou auto sur clic), lien vers `#/dashboard`.
+    5.  **Découverte de la Mini-Academy:** Texte défini, action = visite Mini-Academy, détection manuelle (ou auto sur visite), lien vers `#/mini-academy`.
+    6.  **Création d'un NFT (Optionnel):** Texte défini, action = création tokenURI via outil IPFS, détection auto (idéalement), lien vers `#/create-nft-ipfs`.
+  - Discussion sur la logique de détection de complétion (automatique vs. manuelle) pour chaque item.
+
+
+**L5-M4.2: Conception de l'Intégration UI/UX de la Checklist (Conceptuel)**
+- Date: 2025-06-07T15:40:56+00:00
+- Avancement: Terminé.
+- Concepts UI/UX Définis:
+  - **Emplacement et Visibilité:**
+    - Suggéré: Widget sur le Dashboard avec un 'Callout' lors de la première visite.
+    - Accès permanent via menu de navigation ou page de la Mini-Academy.
+  - **Interaction Utilisateur:**
+    - Cases à cocher (automatiques pour actions détectées, manuelles sinon).
+    - Liens cliquables dans les items.
+    - Feedback visuel pour la complétion d'items (animation, couleur, texte barré).
+  - **Aspect Visuel et Présentation:**
+    - Liste verticale claire et lisible.
+    - Icônes thématiques optionnelles par item.
+    - Barre de progression fortement recommandée pour suivre l'avancement.
+    - Design cohérent avec l'application.
+  - **Comportement une Fois Complétée:**
+    - Message de félicitations.
+    - Options pour masquer ou minimiser la checklist.
+    - Possibilité de retrouver la checklist ultérieurement.
+
+
+**L5-M4.3: Spécification de la Persistance de l'État de la Checklist**
+- Date: 2025-06-07T15:42:15+00:00
+- Avancement: Terminé.
+- Décisions et Spécifications:
+  - **Option de Persistance Choisie (pour MVP):** Côté Client via `localStorage`.
+    - **Avantages:** Simplicité d'implémentation rapide, pas de modification backend immédiate.
+    - **Inconvénients:** Non synchronisé entre appareils/navigateurs, moins robuste.
+    - **Structure de Données (Exemple pour localStorage):**
+      - Clé: `blockdeploy_onboarding_checklist_v1` (ou avec userId si facilement accessible au chargement initial).
+      - Valeur (JSON stringifié): `{ ITEM_1_WALLET_CONNECT: true, ITEM_2_TESTNET: false, ... , checklist_fully_completed: false }` ou un tableau d'IDs d'items complétés: `[ITEM_1_WALLET_CONNECT, ITEM_6_CREATE_NFT]`.
+  - **Planification pour Future Amélioration (Persistance Backend):**
+    - **Avantages:** Robuste, synchronisé, permet l'analyse.
+    - **Schéma/Table Suggéré (`UserOnboardingProgress`):**
+      - `id` (PK)
+      - `userId` (FK vers Users, unique)
+      - `completed_step_ids` (TEXT[] ou JSONB, stockant un tableau d'IDs d'étapes)
+      - `is_fully_completed` (BOOLEAN)
+      - `created_at`, `updated_at` (TIMESTAMPS)
+    - **Endpoints API Suggérés (pour version backend):**
+      - `GET /api/v1/onboarding/checklist/status`
+      - `POST /api/v1/onboarding/checklist/step` (Payload: `{ stepId: string, isCompleted: boolean }`)
+  - **Conclusion pour L5-M4:** L'implémentation se basera sur localStorage pour la gestion de l'état de la checklist.
