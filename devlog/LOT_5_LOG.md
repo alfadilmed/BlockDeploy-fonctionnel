@@ -419,3 +419,109 @@
       - `GET /api/v1/onboarding/checklist/status`
       - `POST /api/v1/onboarding/checklist/step` (Payload: `{ stepId: string, isCompleted: boolean }`)
   - **Conclusion pour L5-M4:** L'implémentation se basera sur localStorage pour la gestion de l'état de la checklist.
+
+
+**L5-M5.1: Définition des Premiers Contenus de la Mini-Academy**
+- Date: 2025-06-07T15:45:02+00:00
+- Avancement: Terminé.
+- Actions de Conception:
+  - Liste des 5 premiers articles pour la Mini-Academy définie :
+    1.  **Titre:** Guide : Déployer votre premier Token ERC-20 avec BlockDeploy.
+        - **Public:** Nouveaux utilisateurs, créateurs de tokens fongibles.
+        - **Objectifs:** Comprendre le déploiement ERC-20 via BlockDeploy, retrouver son contrat.
+        - **Points Clés:** Processus de A à Z, formulaires, options, réseaux, frais, accès post-déploiement.
+
+    2.  **Titre:** Guide : Créer les Métadonnées de votre NFT et Obtenir un `tokenURI` avec BlockDeploy.
+        - **Public:** Créateurs de NFTs (utilisant l'outil IPFS simplifié L4-M7).
+        - **Objectifs:** Utiliser l'outil d'upload IPFS, comprendre `tokenURI`, `imageCID`, `metadataCID`.
+        - **Points Clés:** Métadonnées NFT, IPFS, processus d'upload, signification des résultats, préparation au mint.
+
+
+**L5-M5.1: Définition des Premiers Contenus de la Mini-Academy**
+- Date: 2025-06-07T15:46:03+00:00
+- Avancement: Terminé.
+- Actions de Conception:
+  - Liste des 5 premiers articles pour la Mini-Academy définie :
+    1.  **Titre:** Guide : Déployer votre premier Token ERC-20 avec BlockDeploy.
+        - **Public:** Nouveaux utilisateurs, créateurs de tokens fongibles.
+        - **Objectifs:** Comprendre le déploiement ERC-20 via BlockDeploy, retrouver son contrat.
+        - **Points Clés:** Processus de A à Z, formulaires, options, réseaux, frais, accès post-déploiement.
+
+    2.  **Titre:** Guide : Créer les Métadonnées de votre NFT et Obtenir un `tokenURI` avec BlockDeploy.
+        - **Public:** Créateurs de NFTs (utilisant l'outil IPFS simplifié L4-M7).
+        - **Objectifs:** Utiliser l'outil d'upload IPFS, comprendre `tokenURI`, `imageCID`, `metadataCID`.
+        - **Points Clés:** Métadonnées NFT, IPFS, processus d'upload, signification des résultats, préparation au mint.
+
+    3.  **Titre:** Comprendre et Utiliser les Explorateurs de Blocs (Etherscan, Polygonscan).
+        - **Public:** Tous les utilisateurs.
+        - **Objectifs:** Savoir utiliser un explorateur pour vérifier contrats et transactions.
+        - **Points Clés:** Navigation explorateur, sections clés \(code, tx, events\), suivi de transaction, vérification de contrat.
+
+    4.  **Titre:** Actions sur vos Contrats ERC-20 : Gérer la Pause et le Mint.
+        - **Public:** Utilisateurs de contrats ERC-20 Pausable/Mintable \(L5-M2\).
+        - **Objectifs:** Comprendre et utiliser les actions `pause`, `unpause`, `mint` ERC-20 depuis le Dashboard.
+        - **Points Clés:** Cas d'usage, utilisation des fonctionnalités du Dashboard, importance des droits.
+
+    5.  **Titre:** Actions sur vos NFTs ERC-721 : Gérer la Pause et le Mint.
+        - **Public:** Utilisateurs de contrats ERC-721 Pausable/Mintable \(L5-M3\).
+        - **Objectifs:** Comprendre et utiliser les actions `pause`, `unpause`, `safeMint` ERC-721 depuis le Dashboard.
+        - **Points Clés:** Similaire à ERC-20 pour pause/unpause. Processus de mint NFT \(recipient, tokenId, tokenURI\), clarification sur l'usage du `tokenURI` avec `ERC721MVP.sol`, droits.
+
+
+**L5-M5.2: Conception de la Structure de Rendu UI pour la Mini-Academy (Conceptuel)**
+- Date: 2025-06-07T15:47:17+00:00
+- Avancement: Terminé.
+- Concepts UI/UX et Structure de Rendu Définis:
+  - **Emplacement Principal:** Onglet Academy dans la navigation principale de l'application.
+  - **Page d'Accueil de l'Academy (`#/mini-academy`):**
+    - Titre clair.
+    - Liste des articles disponibles (titre cliquable, optionnellement courte description).
+    - Pour MVP: Pas de tri/filtre avancé, simple liste ordonnée.
+  - **Page de Lecture d'un Article (`#/mini-academy/:article-slug`):**
+    - Contenu principal formaté à partir de Markdown (via `react-markdown` ou similaire).
+    - Styling pour lisibilité (texte, blocs de code avec coloration syntaxique).
+    - Pour MVP: Pas de table des matières auto, ni de navigation précédent/suivant complexe.
+  - **Approche Technique MVP:**
+    - Articles stockés en fichiers Markdown dans `docs/mini-academy/`.
+    - Rendu côté client: Récupération du contenu Markdown (import direct ou fetch d'assets statiques) et parsing/rendu avec une librairie React.
+
+
+**L5-M5.3: Identification des Liens Contextuels (Conceptuel)**
+- Date: 2025-06-07T15:48:39+00:00
+- Avancement: Terminé.
+- Identification des Emplacements pour Liens Contextuels vers la Mini-Academy:
+  - **1. Checklist d'Onboarding (L5-M4):**
+    - Item 'Comprendre les Réseaux de Test' -> Article sur l'obtention de tokens de test (ou section d'un autre guide).
+    - Item 'Premier Déploiement ERC-20' -> Article 'Guide : Déployer votre premier Token ERC-20'.
+    - Item 'Explorer votre Contrat' -> Article 'Comprendre et Utiliser les Explorateurs de Blocs'.
+    - Item 'Découverte de la Mini-Academy' -> Page d'accueil de la Mini-Academy.
+    - Item 'Création d'un NFT' -> Article 'Guide : Créer les Métadonnées de votre NFT et Obtenir un `tokenURI`'.
+  - **2. Dashboard - Vue Détaillée d'un Contrat:**
+    - Près des infos du contrat (adresse) -> Article sur les explorateurs de blocs.
+    - Près des boutons d'actions ERC-20 (pause/mint) -> Article 'Actions sur vos Contrats ERC-20'.
+    - Près des boutons d'actions ERC-721 (pause/mint) -> Article 'Actions sur vos NFTs ERC-721'.
+    - Spécifique au mint NFT (champ `tokenURI`) -> Article 'Guide : Créer les Métadonnées de votre NFT'.
+  - **3. Formulaires de Déploiement (ERC-20, ERC-721):**
+    - À côté des options (Pausable, Mintable, etc.) -> Liens vers les articles respectifs sur les actions ERC-20/ERC-721.
+    - Pour ERC-721 (champ `baseURI`) -> Explication du rôle du `baseURI` (section d'un guide NFT).
+  - **4. Messages de Succès Post-Action (Déploiement, Mint):**
+    - Lien vers l'article sur les explorateurs (après déploiement).
+    - Lien vers l'article sur les actions de token (après mint ERC-20).
+
+
+**L5-M5.4: Création des Fichiers Squelettes pour les Articles et Documentation**
+- Date: 2025-06-07T15:50:02+00:00
+- Avancement: Terminé.
+- Actions:
+  - Création des 5 fichiers Markdown squelettes pour les premiers articles de la Mini-Academy dans `docs/mini-academy/` (ex: `01_deploy_erc20_guide.md`, etc.).
+  - Chaque fichier squelette contient le titre de l'article, le public cible et les objectifs d'apprentissage.
+  - Création du document de conception `docs/features/L5_M5_MINI_ACADEMY_CONTENT_AND_STRUCTURE.md`.
+  - Ce document de conception synthétise les décisions des étapes L5-M5.1 (contenu), L5-M5.2 (structure UI), et L5-M5.3 (liens contextuels).
+
+
+**L5-M5.5: Mettre à Jour `devlog/LOT_5_LOG.md` (Finalisation L5-M5)**
+- Date: 2025-06-07T15:51:20+00:00
+- Avancement: Terminé.
+- Actions:
+  - Le `devlog/LOT_5_LOG.md` a été maintenu à jour tout au long de L5-M5.
+  - **FIN DE LA MILESTONE L5-M5: Mini-Academy - Premiers Articles de Fond (Phase de Conception et Structuration).**
