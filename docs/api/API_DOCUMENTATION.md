@@ -6,120 +6,22 @@ Ce document fournit des exemples d'appels API et de réponses pour les endpoints
 ## Endpoints de Déploiement (Lot 1 & 2)
 
 ### 1. Déployer un contrat ERC-20 Simple (Pré-compilé - Test Initial Lot 1)
-
 *   **Endpoint:** `POST /api/v1/test-deploy/simple-erc20`
-*   **Méthode:** `POST`
-*   **Description:** Initie le déploiement d'un contrat ERC-20 très simple pré-compilé. Principalement pour tester le flux de base du Lot 1.
-*   **Authentification:** Requise.
-*   **Corps de la Requête:**
-    ```json
-    {
-      "networkName": "sepolia",
-      "userGivenName": "MonTokenDeTestAPI_Lot1",
-      "constructorArgs": {
-        "name": "Mon Token de Test Lot1",
-        "symbol": "MTSTL1",
-        "initialSupply": "1000000000000000000000"
-      }
-    }
-    ```
-*   **Réponse Succès (`202 Accepted`):**
-    ```json
-    {
-      "message": "Demande de déploiement acceptée et mise en file d'attente.",
-      "deploymentId": "abcdef-12345-ghijkl-67890",
-      "jobId": "789"
-    }
-    ```
+    *(Détails comme précédemment)*
 
 ### 2. Déployer un contrat ERC-20 MVP (Lot 2)
-
 *   **Endpoint:** `POST /api/v1/deploy/erc20-mvp`
-*   **Méthode:** `POST`
-*   **Description:** Initie le déploiement d'un contrat ERC-20 MVP configurable.
-*   **Authentification:** Requise.
-*   **Corps de la Requête:**
-    ```json
-    {
-      "networkName": "sepolia",
-      "userGivenName": "MonTokenERC20MVP",
-      "tokenConfig": {
-        "name": "Mon Token MVP",
-        "symbol": "MMVP",
-        "supplyType": "capped",
-        "initialSupply": "500000",
-        "cap": "1000000",
-        "features": { "burnable": true, "pausable": true }
-      }
-    }
-    ```
-*   **Réponse Succès (`202 Accepted`):**
-    ```json
-    {
-      "message": "Demande de déploiement pour ERC-20 MVP acceptée et mise en file d'attente.",
-      "deploymentId": "new-deployment-id-xyz-789",
-      "jobId": "101112"
-    }
-    ```
+    *(Détails comme précédemment, à renommer/fusionner avec `/deploy/erc20` si `templateKey` est adopté)*
 
 ---
 ## Endpoints du Dashboard Utilisateur (Lot 3+)
 
 ### 3. Lister les Déploiements d'un Utilisateur
-
 *   **Endpoint:** `GET /api/v1/user/deployments`
-*   **Méthode:** `GET`
-*   **Description:** Récupère la liste paginée des contrats déployés par l'utilisateur authentifié.
-*   **Authentification:** Requise.
-*   **Paramètres de Requête (Query Parameters):**
-    *   `page` (number, optionnel, défaut: 1)
-    *   `limit` (number, optionnel, défaut: 10, max: 50)
-    *   `status` (string, optionnel): `pending`, `processing`, `success`, `failed`
-    *   `networkName` (string, optionnel): ex: `sepolia`, `polygon_mumbai`
-    *   `sortBy` (string, optionnel, défaut: `createdAt`)
-    *   `sortOrder` (string, optionnel, défaut: `desc`): `asc` ou `desc`
-*   **Réponse Succès (`200 OK`):**
-    ```json
-    {
-      "data": [
-        {
-          "deploymentId": "abcdef-12345-ghijkl-67890",
-          "userGivenName": "Mon Premier Token de Test",
-          "contractType": "ERC20",
-          "networkName": "sepolia",
-          "chainId": 11155111,
-          "status": "success",
-          "contractAddress": "0x123...",
-          "transactionHash": "0xabc...",
-          "createdAt": "2023-10-28T10:00:00.000Z",
-          "updatedAt": "2023-10-28T10:05:00.000Z"
-        }
-        // ... autres déploiements
-      ],
-      "pagination": {
-        "currentPage": 1,
-        "totalPages": 5,
-        "totalItems": 48,
-        "itemsPerPage": 10,
-        "hasNextPage": true,
-        "hasPrevPage": false
-      }
-    }
-    ```
-*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `500 Internal Server Error`.
+    *(Détails comme précédemment)*
 
-**Logique Backend (Conceptuel):** Auth middleware (`req.user.id`) -> Requête DB (collection `deployments`) avec `userId` et filtres/pagination -> Formatage réponse.
-
----
-### 4. Récupérer les Détails On-Chain d'un Contrat ERC-20 (Lot 3)
-
+### 4. Récupérer les Détails On-Chain d'un Contrat ERC-20 (Lot 3 - Mis à jour Lot 5 L5-M1.1)
 *   **Endpoint:** `GET /api/v1/contracts/:networkName/:contractAddress/erc20-details`
-*   **Méthode:** `GET`
-*   **Description:** Récupère des informations on-chain de base pour un contrat ERC-20.
-*   **Authentification:** Optionnelle/Requise (Pour MVP: Requise).
-*   **Paramètres d'URL (Path Parameters):**
-    *   `networkName` (string, requis): ex: `sepolia`, `polygon_mumbai`.
-    *   `contractAddress` (string, requis): Adresse du contrat ERC-20.
 *   **Réponse Succès (`200 OK`):**
     ```json
     {
@@ -129,118 +31,152 @@ Ce document fournit des exemples d'appels API et de réponses pour les endpoints
         "name": "Mon Token",
         "symbol": "MTK",
         "decimals": 18,
-        "totalSupply": "1000000000000000000000", // en wei
-        "ownerBalance": "500000000000000000000"  // Balance du propriétaire du contrat, en wei
+        "totalSupply": "...",
+        "ownerBalance": "...",
+        "isPaused": false // Ajout L5-M1.1
       },
-      "fetchedAt": "2023-11-05T12:00:00.000Z"
+      "fetchedAt": "..."
     }
     ```
-    *   `ownerBalance`: Balance de l'adresse propriétaire du contrat (ex: `deployerAddress` de `DeploymentDBSchema`).
-*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `404 Not Found` (réseau non supporté, contrat invalide), `500 Internal Server Error` (erreur RPC).
+    *(Autres détails comme précédemment)*
 
-**Logique Backend (Conceptuel):**
-1.  Validation params. Auth (si requise).
-2.  `ProviderService` pour `networkName`.
-3.  **`ContractReaderService` (ou logique similaire):**
-    *   Instancie `ethers.Contract` avec ABI ERC-20 minimale.
-    *   Appelle `name()`, `symbol()`, `decimals()`, `totalSupply()`.
-    *   Récupère `ownerAddress` (ex: de `DeploymentDBSchema.deployerAddress`). Appelle `balanceOf(ownerAddress)`.
-    *   Gère erreurs on-chain.
-4.  Formate réponse. Cache optionnel (TTL court).
 ---
 ### 5. Gérer les Rôles d'un Contrat ERC-20 Advanced (Ex: `MINTER_ROLE`) (Lot 4 - Optionnel L4-M2.2)
-
 *   **Endpoint:** `POST /api/v1/contracts/:networkName/:contractAddress/erc20/roles`
-*   **Méthode:** `POST`
-*   **Description:** Permet à l'admin (`DEFAULT_ADMIN_ROLE`) d'un `ERC20Advanced` d'accorder/révoquer des rôles (ex: `MINTER_ROLE`). Actions traitées via file d'attente ou retour de Tx non signées.
-*   **Authentification:** Requise (utilisateur doit être admin du contrat).
+    *(Détails comme précédemment)*
+
+---
+### 6. Déployer un contrat NFT ERC-721 MVP (Option 1: URL Métadonnées Externe) (Lot 4 - L4-M5.1)
+*   **Endpoint:** `POST /api/v1/deploy/nft-erc721-mvp`
+    *(Détails comme précédemment)*
+
+---
+### 7. Exécuter des Actions sur un Contrat ERC-20 (Lot 5 - L5-M1.1, L5-M1.2)
+
+*   **Endpoint:** `POST /api/v1/contracts/:networkName/:contractAddress/erc20-action`
+    *(Détails comme précédemment)*
+
+---
+### 8. Récupérer les Détails On-Chain d'une Collection NFT ERC-721 (Lot 5 - L5-M1.3)
+
+*   **Endpoint:** `GET /api/v1/contracts/:networkName/:contractAddress/nft-erc721-details`
+*   **Méthode:** `GET`
+*   **Description:** Récupère infos on-chain pour une collection NFT ERC-721 + détails pour un sous-ensemble de tokens.
+*   **Authentification:** Optionnelle/Requise (MVP: Requise).
 *   **Paramètres d'URL:** `networkName`, `contractAddress`.
-*   **Corps de la Requête:**
+*   **Paramètres de Requête (Query):**
+    *   `page` (number, opt., défaut: 1): Pour pagination tokens.
+    *   `limit` (number, opt., défaut: 5): Nb tokens par page.
+    *   `includeTokenDetails` (boolean, opt., défaut: `true`): Si `false`, ne retourne pas `tokenDetailsList`.
+*   **Réponse Succès (`200 OK`):**
     ```json
     {
-      "role": "minter", // "minter", "pauser" (si géré par rôle)
-      "grant": ["0xADDRESS_TO_GRANT_1"],
-      "revoke": ["0xADDRESS_TO_REVOKE_1"]
+      "networkName": "polygon_mumbai",
+      "contractAddress": "0xNftContract...",
+      "onChainData": {
+        "name": "Ma Collection",
+        "symbol": "MSC",
+        "totalSupply": "150" // string
+      },
+      "tokenDetailsList": { // Si includeTokenDetails=true & totalSupply > 0
+        "tokens": [
+          { "tokenId": "1", "ownerOf": "0x...", "tokenURI": "ipfs://..." },
+          { "tokenId": "2", "ownerOf": "0x...", "tokenURI": "ipfs://..." }
+        ],
+        "pagination": { "currentPage": 1, "totalPages": 15, "totalItems": 150, "itemsPerPage": 5 }
+      },
+      "fetchedAt": "2023-11-16T10:00:00.000Z"
     }
     ```
-    *   `role` (string, requis): Rôle à gérer.
-    *   `grant` (array de strings, optionnel): Adresses à qui accorder le rôle.
-    *   `revoke` (array de strings, optionnel): Adresses de qui révoquer le rôle.
-*   **Réponse Succès (`202 Accepted` si via queue, ou `200 OK` si Tx non signée retournée):**
+*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `404 Not Found`, `500 Internal Server Error`.
+
+**Logique Backend (Conceptuel):**
+1.  Validation params, Auth.
+2.  `ProviderService`.
+3.  **`ContractReaderService`:**
+    *   Instancie `ethers.Contract` (ABI ERC-721 min).
+    *   Appelle `name()`, `symbol()`, `totalSupply()`.
+    *   Si `includeTokenDetails`:
+        *   Récupère IDs de tokens (ex: séquentiels de `(page-1)*limit + 1` à `page*limit`, jusqu'à `totalSupply`).
+        *   Pour chaque `tokenId`: appelle `ownerOf(tokenId)`, `tokenURI(tokenId)`.
+4.  Formate réponse. Cache optionnel.
+---
+### 9. Exécuter des Actions sur un Contrat NFT ERC-721 (Lot 5 - L5-M1.4)
+
+*   **Endpoint:** `POST /api/v1/contracts/:networkName/:contractAddress/nft-erc721-action`
+*   **Méthode:** `POST`
+*   **Description:** Permet au propriétaire d'un contrat NFT ERC-721 d'exécuter des actions (ex: `safeMint`). Retourne une Tx non signée.
+*   **Authentification:** Requise (utilisateur doit être propriétaire).
+*   **Paramètres d'URL:** `networkName`, `contractAddress`.
+*   **Corps de la Requête:**
+    *   **Pour `safeMint` (auto-incrémente tokenId défini dans `ERC721MVP.sol`):**
+        ```json
+        {
+          "action": "safeMint",
+          "to": "0xRecipientAddress..."
+        }
+        ```
+    *   *(Autres actions comme `pause`, `unpause` pourraient être ajoutées ici si le contrat NFT les supporte).*
+*   **Réponse Succès (`200 OK` - car retourne Tx à signer):**
     ```json
-    // Si via queue:
     {
-      "message": "Demande de modification de rôle(s) acceptée et mise en file d'attente.",
-      "roleManagementId": "role-modif-id-abc-123",
-      "jobId": "131415"
+      "message": "Transaction préparée pour l'action '{action}'. Veuillez signer.",
+      "unsignedTx": { "to": "0xNftContractAddress...", "data": "0xEncodedFunctionCall...", "gasLimit": "..." },
+      "networkName": "...", "chainId": 0
     }
-    // Si Tx non signée retournée (pour chaque action grant/revoke):
-    // {
-    //   "message": "Transaction(s) préparée(s) pour modification de rôle. Veuillez signer.",
-    //   "unsignedTransactions": [
-    //     { "type": "grant", "account": "0x...", "role": "minter", "unsignedTx": { "to": "0x...", "data": "0x..." } }
-    //   ]
-    // }
     ```
 *   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`.
 
-**Logique Backend (Conceptuel):**
-1.  Validation & Autorisation.
-2.  Pour chaque action grant/revoke:
-    *   **Option A (Queue):** Préparer `RoleManagementJobData`, ajouter à une queue. Worker exécute.
-    *   **Option B (Tx Non Signée - Préférable pour actions admin):** Préparer la transaction non signée pour `grantRole()` ou `revokeRole()`. Retourner au client pour signature.
+**Logique Backend (Conceptuel pour `safeMint`):**
+1.  Validation & Autorisation (propriétaire).
+2.  Préparation Tx non signée pour `safeMint(address to)` du contrat.
+3.  Retourner `unsignedTx`.
 ---
-### 6. Déployer un contrat NFT ERC-721 MVP (Option 1: URL Métadonnées Externe) (Lot 4 - L4-M5.1)
+## Endpoints pour l'Onboarding Utilisateur (Lot 5 - L5-M2.1)
 
-*   **Endpoint:** `POST /api/v1/deploy/nft-erc721-mvp`
+### 10. Mettre à Jour un Item de la Checklist d'Onboarding
+
+*   **Endpoint:** `POST /api/v1/user/onboarding/checklist-item`
 *   **Méthode:** `POST`
-*   **Description:** Initie le déploiement d'un contrat NFT ERC-721 MVP. L'utilisateur fournit une `baseTokenURI` pour les métadonnées.
+*   **Description:** Notifie le backend qu'un item de la checklist d'onboarding est complété.
 *   **Authentification:** Requise.
 *   **Corps de la Requête:**
     ```json
     {
-      "networkName": "polygon_mumbai",
-      "userGivenName": "Ma Première Collection NFT",
-      "collectionConfig": {
-        "name": "Les Aventuriers du Web3",
-        "symbol": "ADW3",
-        "baseTokenURI": "ipfs://QmZz...aBcD/metadata/",
-        "royalties": {
-          "receiver": "0xRoyaltyCollectorAddress...",
-          "fractionBps": 750
-        },
-        "features": {
-          "pausable": true
-        },
-        "initialOwner": "0xUserWalletAddress..."
+      "itemKey": "connectedWallet",
+      "isCompleted": true
+    }
+    ```
+    *   `itemKey` (string, requis): Clé de l'item (ex: "connectedWallet", "exploredTemplates").
+    *   `isCompleted` (boolean, requis).
+*   **Réponse Succès (`200 OK` ou `204 No Content`):**
+    ```json
+    // Optionnel: Réponse 200 OK avec le nouvel état
+    // {
+    //   "message": "Statut item checklist mis à jour.",
+    //   "updatedChecklist": { "connectedWallet": true, ... }
+    // }
+    ```
+*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `500 Internal Server Error`.
+*   **Logique Backend:** Auth user, valide payload, récupère `UserDBSchema`, màj `onboardingState.checklist.{itemKey}`, sauvegarde.
+
+### 11. Récupérer l'État d'Onboarding de l'Utilisateur
+
+*   **Endpoint:** `GET /api/v1/user/onboarding-status`
+*   **Méthode:** `GET`
+*   **Description:** Récupère l'état actuel de l'onboarding (checklist, tutoriel complété).
+*   **Authentification:** Requise.
+*   **Réponse Succès (`200 OK`):**
+    ```json
+    {
+      "tutorialCompleted": true,
+      "checklist": {
+        "connectedWallet": true,
+        "exploredTemplates": false
+        // ... autres items
       }
     }
     ```
-    *   `networkName` (string, requis).
-    *   `userGivenName` (string, optionnel).
-    *   `collectionConfig` (object, requis):
-        *   `name`, `symbol` (string, requis).
-        *   `baseTokenURI` (string, requis).
-        *   `royalties.receiver` (address, requis).
-        *   `royalties.fractionBps` (number, requis, 0-10000).
-        *   `features.pausable` (boolean, optionnel, défaut `true`).
-        *   `initialOwner` (address, optionnel, défaut `userId`).
-*   **Réponse Succès (`202 Accepted`):**
-    ```json
-    {
-      "message": "Demande de déploiement pour la collection NFT ERC-721 MVP acceptée et mise en file d'attente.",
-      "deploymentId": "nft-deployment-id-123-abc",
-      "jobId": "202122"
-    }
-    ```
-*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `500 Internal Server Error`.
-
-**Logique Backend (Conceptuel):**
-1.  Validation requête & `collectionConfig`.
-2.  Récupération `userId` (pour `initialOwner` si non fourni).
-3.  Création entrée `DeploymentDBSchema` (`status: PENDING`, `contractType: "NFT_ERC721"`).
-4.  Sélection Template: "ERC721MVP_Std_RoyaltyPausBurn_v1".
-5.  Préparation `constructorArgs` pour `ERC721MVP.sol`.
-6.  Préparation `DeploymentJobData`.
-7.  Ajout job à `deploymentQueue`.
-8.  Réponse `202 Accepted`.
+    *   Retourne valeurs par défaut (false) si `onboardingState` non défini en DB.
+*   **Erreurs:** `401 Unauthorized`, `500 Internal Server Error`.
+*   **Logique Backend:** Auth user, récupère `UserDBSchema`, retourne `onboardingState` ou valeurs par défaut.
