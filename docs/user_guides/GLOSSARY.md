@@ -121,3 +121,8 @@ Naviguez par ordre alphabétique ou utilisez la fonction de recherche de votre n
 
 *   **Wallet:** Voir "Portefeuille".
 *   **Wei:** La plus petite unité d'Ether (1 ETH = 10^18 Wei).
+
+---
+
+### Envie d'en savoir plus ?
+Pour une explication plus détaillée de certains de ces concepts et de leur application, visitez notre [Academy BlockDeploy](/academy).

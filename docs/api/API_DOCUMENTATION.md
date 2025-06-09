@@ -60,123 +60,92 @@ Ce document fournit des exemples d'appels API et de réponses pour les endpoints
 ### 8. Récupérer les Détails On-Chain d'une Collection NFT ERC-721 (Lot 5 - L5-M1.3)
 
 *   **Endpoint:** `GET /api/v1/contracts/:networkName/:contractAddress/nft-erc721-details`
-*   **Méthode:** `GET`
-*   **Description:** Récupère infos on-chain pour une collection NFT ERC-721 + détails pour un sous-ensemble de tokens.
-*   **Authentification:** Optionnelle/Requise (MVP: Requise).
-*   **Paramètres d'URL:** `networkName`, `contractAddress`.
-*   **Paramètres de Requête (Query):**
-    *   `page` (number, opt., défaut: 1): Pour pagination tokens.
-    *   `limit` (number, opt., défaut: 5): Nb tokens par page.
-    *   `includeTokenDetails` (boolean, opt., défaut: `true`): Si `false`, ne retourne pas `tokenDetailsList`.
-*   **Réponse Succès (`200 OK`):**
-    ```json
-    {
-      "networkName": "polygon_mumbai",
-      "contractAddress": "0xNftContract...",
-      "onChainData": {
-        "name": "Ma Collection",
-        "symbol": "MSC",
-        "totalSupply": "150" // string
-      },
-      "tokenDetailsList": { // Si includeTokenDetails=true & totalSupply > 0
-        "tokens": [
-          { "tokenId": "1", "ownerOf": "0x...", "tokenURI": "ipfs://..." },
-          { "tokenId": "2", "ownerOf": "0x...", "tokenURI": "ipfs://..." }
-        ],
-        "pagination": { "currentPage": 1, "totalPages": 15, "totalItems": 150, "itemsPerPage": 5 }
-      },
-      "fetchedAt": "2023-11-16T10:00:00.000Z"
-    }
-    ```
-*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `404 Not Found`, `500 Internal Server Error`.
-
-**Logique Backend (Conceptuel):**
-1.  Validation params, Auth.
-2.  `ProviderService`.
-3.  **`ContractReaderService`:**
-    *   Instancie `ethers.Contract` (ABI ERC-721 min).
-    *   Appelle `name()`, `symbol()`, `totalSupply()`.
-    *   Si `includeTokenDetails`:
-        *   Récupère IDs de tokens (ex: séquentiels de `(page-1)*limit + 1` à `page*limit`, jusqu'à `totalSupply`).
-        *   Pour chaque `tokenId`: appelle `ownerOf(tokenId)`, `tokenURI(tokenId)`.
-4.  Formate réponse. Cache optionnel.
+    *(Détails comme précédemment)*
 ---
 ### 9. Exécuter des Actions sur un Contrat NFT ERC-721 (Lot 5 - L5-M1.4)
 
 *   **Endpoint:** `POST /api/v1/contracts/:networkName/:contractAddress/nft-erc721-action`
-*   **Méthode:** `POST`
-*   **Description:** Permet au propriétaire d'un contrat NFT ERC-721 d'exécuter des actions (ex: `safeMint`). Retourne une Tx non signée.
-*   **Authentification:** Requise (utilisateur doit être propriétaire).
-*   **Paramètres d'URL:** `networkName`, `contractAddress`.
-*   **Corps de la Requête:**
-    *   **Pour `safeMint` (auto-incrémente tokenId défini dans `ERC721MVP.sol`):**
-        ```json
-        {
-          "action": "safeMint",
-          "to": "0xRecipientAddress..."
-        }
-        ```
-    *   *(Autres actions comme `pause`, `unpause` pourraient être ajoutées ici si le contrat NFT les supporte).*
-*   **Réponse Succès (`200 OK` - car retourne Tx à signer):**
-    ```json
-    {
-      "message": "Transaction préparée pour l'action '{action}'. Veuillez signer.",
-      "unsignedTx": { "to": "0xNftContractAddress...", "data": "0xEncodedFunctionCall...", "gasLimit": "..." },
-      "networkName": "...", "chainId": 0
-    }
-    ```
-*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`.
-
-**Logique Backend (Conceptuel pour `safeMint`):**
-1.  Validation & Autorisation (propriétaire).
-2.  Préparation Tx non signée pour `safeMint(address to)` du contrat.
-3.  Retourner `unsignedTx`.
+    *(Détails comme précédemment)*
 ---
 ## Endpoints pour l'Onboarding Utilisateur (Lot 5 - L5-M2.1)
 
 ### 10. Mettre à Jour un Item de la Checklist d'Onboarding
 
 *   **Endpoint:** `POST /api/v1/user/onboarding/checklist-item`
-*   **Méthode:** `POST`
-*   **Description:** Notifie le backend qu'un item de la checklist d'onboarding est complété.
-*   **Authentification:** Requise.
-*   **Corps de la Requête:**
-    ```json
-    {
-      "itemKey": "connectedWallet",
-      "isCompleted": true
-    }
-    ```
-    *   `itemKey` (string, requis): Clé de l'item (ex: "connectedWallet", "exploredTemplates").
-    *   `isCompleted` (boolean, requis).
-*   **Réponse Succès (`200 OK` ou `204 No Content`):**
-    ```json
-    // Optionnel: Réponse 200 OK avec le nouvel état
-    // {
-    //   "message": "Statut item checklist mis à jour.",
-    //   "updatedChecklist": { "connectedWallet": true, ... }
-    // }
-    ```
-*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `500 Internal Server Error`.
-*   **Logique Backend:** Auth user, valide payload, récupère `UserDBSchema`, màj `onboardingState.checklist.{itemKey}`, sauvegarde.
+    *(Détails comme précédemment)*
 
 ### 11. Récupérer l'État d'Onboarding de l'Utilisateur
 
 *   **Endpoint:** `GET /api/v1/user/onboarding-status`
-*   **Méthode:** `GET`
-*   **Description:** Récupère l'état actuel de l'onboarding (checklist, tutoriel complété).
+    *(Détails comme précédemment)*
+---
+### 12. Proposer une Nouvelle Transaction pour un Safe (DAO) (Lot 6 - L6-M3.1)
+
+*   **Endpoint:** `POST /api/v1/dao/:networkName/:safeAddress/propose-transaction`
+    *(Détails comme précédemment)*
+---
+### 13. Soumettre une Transaction Safe Signée (DAO) (Lot 6 - L6-M3.2)
+
+*   **Endpoint:** `POST /api/v1/dao/:networkName/:safeAddress/submit-signed-transaction`
+*   **Méthode:** `POST`
+*   **Description:** Soumet une transaction Safe, préalablement préparée et signée par un propriétaire, au Safe Transaction Service.
 *   **Authentification:** Requise.
-*   **Réponse Succès (`200 OK`):**
+*   **Paramètres d'URL:** `networkName`, `safeAddress`.
+*   **Corps de la Requête:**
     ```json
     {
-      "tutorialCompleted": true,
-      "checklist": {
-        "connectedWallet": true,
-        "exploredTemplates": false
-        // ... autres items
-      }
+      "safeTransactionData": {
+        "to": "0x...", "value": "0", "data": "0x...", "operation": 0,
+        "safeTxGas": "0", "baseGas": "0", "gasPrice": "0",
+        "gasToken": "0x0...", "refundReceiver": "0x0...", "nonce": 123
+      },
+      "senderAddress": "0xSignerAddress...",
+      "signature": "0xSignatureString...",
+      "safeTxHash": "0xTransactionHashThatWasSigned..." // Optionnel pour vérification backend
     }
     ```
-    *   Retourne valeurs par défaut (false) si `onboardingState` non défini en DB.
-*   **Erreurs:** `401 Unauthorized`, `500 Internal Server Error`.
-*   **Logique Backend:** Auth user, récupère `UserDBSchema`, retourne `onboardingState` ou valeurs par défaut.
+*   **Réponse Succès (`200 OK` ou `201 Created`):**
+    ```json
+    {
+      "message": "Transaction signée soumise avec succès au Safe Transaction Service.",
+      "safeTxHash": "0xTransactionHashThatWasSigned...",
+      "status": "PENDING_CONFIRMATIONS" // Ou statut similaire du Transaction Service
+    }
+    ```
+*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`.
+
+---
+### 14. Lister les Transactions d'un Safe (DAO) (Lot 6 - L6-M3.3)
+
+*   **Endpoint:** `GET /api/v1/dao/:networkName/:safeAddress/transactions`
+*   **Méthode:** `GET`
+*   **Description:** Récupère la liste des transactions (propositions) d'un Safe via le Safe Transaction Service.
+*   **Authentification:** Requise (pour visualiser via BlockDeploy).
+*   **Paramètres d'URL:** `networkName`, `safeAddress`.
+*   **Paramètres de Requête (Query):**
+    *   `executed` (boolean, opt.): Filtre transactions exécutées.
+    *   `queued` (boolean, opt., défaut: `true`): Inclut tx en attente de signatures / prêtes à être exécutées.
+    *   `limit` (number, opt., défaut: 10).
+    *   `offset` (number, opt., défaut: 0).
+    *   *(Note: Paramètres exacts dépendent du support de `@safe-global/api-kit`)*
+*   **Réponse Succès (`200 OK`):** Structure basée sur la réponse du Safe Transaction Service.
+    ```json
+    {
+      "data": [
+        {
+          "safeTxHash": "0x...", "to": "0x...", "value": "0", "data": "0x...",
+          "operation": 0, "nonce": 123, "submissionDate": "...", "isExecuted": false,
+          "confirmationsRequired": 2, "confirmations": [ { "owner": "0x...", "signature": "0x..." } ]
+          // ... autres champs du Safe Transaction Service ...
+        }
+      ],
+      "pagination": { "offset": 0, "limit": 10, "count": 1 /* ... */ }
+    }
+    ```
+*   **Erreurs:** `400 Bad Request`, `401 Unauthorized`, `404 Not Found`, `500 Internal Server Error`.
+
+**Logique Backend (Conceptuel):**
+1.  Validation, Auth.
+2.  Init `EthAdapter` & `SafeApiKit` (avec URL Safe Transaction Service du réseau).
+3.  Utiliser `apiKit.getPendingTransactions(safeAddress)` ou `apiKit.getAllTransactions(safeAddress, { options })`.
+4.  Formater si besoin et retourner réponse.

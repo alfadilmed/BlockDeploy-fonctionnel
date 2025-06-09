@@ -47,3 +47,38 @@
 *   **TST-ONB-GL-002:** Lisibilité et structure.
 
 Ces tests conceptuels visent à assurer l'intégration et l'UX des fonctionnalités du Lot 3.
+
+---
+## Extensions des Tests pour le Lot 5 (L5-M4.1)
+
+### 4. Scénarios de Test pour les Actions de Contrat Enrichies (Dashboard - L5-M1)
+
+**a. Action `mint` pour ERC-20 Advanced (L5-M1.2)**
+*   **TST-DASH-ACT-ERC20-MINT-001:** Visibilité bouton/section "Minter des Tokens" (conditionnelle au rôle `MINTER_ROLE` et contrat Capped).
+*   **TST-DASH-ACT-ERC20-MINT-002:** Action "Minter des Tokens" - Succès (appel API, Tx simulée, feedback UI, màj `totalSupply`).
+*   **TST-DASH-ACT-ERC20-MINT-003:** Échec (Dépassement Cap).
+*   **TST-DASH-ACT-ERC20-MINT-004:** Échec (Pas `MINTER_ROLE`).
+
+**b. Affichage Détails On-Chain NFT & Galerie (L5-M1.3)**
+*   **TST-DASH-NFTD-001:** Affichage `totalSupply` NFT et mise à jour post-mint.
+*   **TST-DASH-NFTD-002:** Affichage Galerie Simple (si tokens mintés, `tokenURI` valides, images chargées depuis IPFS simulé). Infos au survol/clic.
+*   **TST-DASH-NFTD-003:** Affichage Détails NFT Spécifique (`ownerOf`, `tokenURI`).
+
+**c. Action `safeMint(to)` pour NFT ERC-721 (L5-M1.4)**
+*   **TST-DASH-ACT-NFT-MINT-001:** Visibilité bouton/section "Minter un Nouveau NFT" (conditionnelle au propriétaire).
+*   **TST-DASH-ACT-NFT-MINT-002:** Action "Minter un Nouveau NFT" - Succès (appel API, Tx simulée, feedback UI, màj `totalSupply`).
+*   **TST-DASH-ACT-NFT-MINT-003:** Échec (Non Propriétaire).
+
+### 5. Scénarios de Test pour la Checklist d'Onboarding (L5-M2)
+*   **TST-ONB-CKL-001:** Affichage Initial Checklist pour nouvel utilisateur.
+*   **TST-ONB-CKL-002:** Complétion Automatique item (ex: `exploredTemplates` via navigation). Vérif appel API.
+*   **TST-ONB-CKL-003:** Persistance état checklist (déconnexion/reconnexion).
+*   **TST-ONB-CKL-004:** Masquer/Réafficher checklist (persistance visibilité).
+*   **TST-ONB-CKL-005:** Complétion tous items (message félicitations, masquage auto).
+
+### 6. Scénarios de Test pour la Mini-Academy (Articles - L5-M3)
+*   **TST-ACAD-NAV-001:** Accès Page Principale Academy (`/academy`), liste articles.
+*   **TST-ACAD-NAV-002:** Accès Article Spécifique (contenu Markdown formaté).
+*   **TST-ACAD-NAV-003:** Liens depuis "Aide / Premiers Pas" et "Glossaire" vers Academy fonctionnels.
+
+Ces tests conceptuels couvrent les nouvelles fonctionnalités du Lot 5.

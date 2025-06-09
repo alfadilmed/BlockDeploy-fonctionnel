@@ -48,3 +48,8 @@ Si vous avez d'autres questions, n'hésitez pas à :
 *   Contacter notre support (lien vers la page de contact/support à venir).
 
 Nous espérons que vous apprécierez la simplicité et la puissance de BlockDeploy !
+
+## Explorer Plus Loin : Notre Academy
+
+Pour approfondir vos connaissances sur les smart contracts, les tokens et les NFTs, n'hésitez pas à consulter les ressources de notre Mini-Academy.
+*   ➡️ **[Accéder à l'Academy BlockDeploy](/academy)**
