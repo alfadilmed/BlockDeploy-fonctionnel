@@ -417,3 +417,19 @@
     - Les messages d'erreur retournés par l'API (ex: validation échouée, échec de déploiement) sont affichés à l'utilisateur.
     - Une gestion des erreurs réseau génériques est également en place.
 - Statut: Cette tâche est considérée comme finalisée. Les modifications apportées à `WizardConfigPage.tsx` permettent une création de DAO fonctionnelle via l'interface utilisateur, avec un retour d'information adéquat à l'utilisateur.
+
+---
+
+**L6-M5: Frontend - Interface de Gestion des Propositions (Conceptuel)**
+- Date: 2025-06-07T18:00:00+00:00 (Heure indicative de finalisation)
+- Avancement: Terminé.
+- Description des Accomplissements:
+  - Création et remplissage du document de conception UI/UX `docs/ui_ux/L6_M5_DAO_PROPOSAL_MANAGEMENT_UI.md`.
+  - Le document détaille de manière conceptuelle les aspects suivants de l'interface utilisateur pour la gestion des propositions DAO :
+    - **Contexte et Emplacement :** Accès via la page de détail d'une DAO, permissions utilisateur.
+    - **Affichage des Propositions :** Structure de liste, options de tri et de filtrage (par statut), contenu détaillé des cartes de proposition individuelles (ID, titre, statut, détails de l'action, progression des confirmations, initiateur, dates, boutons d'action contextuels).
+    - **Soumission d'une Nouvelle Proposition :** Formulaire en plusieurs étapes (choix du type, remplissage des détails), support pour divers types de propositions (transfert de fonds, ajout/retrait de propriétaire, changement de seuil, transaction personnalisée), et assistance à la construction du champ `data` pour les types courants. Inclut une étape de revue et soumission.
+    - **Interaction avec les Propositions Existantes :** Processus de confirmation (signature) et d'exécution des propositions, conditions d'affichage des boutons d'action, et feedback utilisateur.
+    - **Wireframes / Maquettes ASCII :** Représentations textuelles de la page de propositions et de la modale de création.
+    - **États et Feedback Utilisateur :** Stratégies pour gérer les états de chargement, les notifications de succès, les messages d'erreur (validation, signature, transaction, API), et autres indications visuelles.
+- Statut: La phase de conception conceptuelle pour l'interface de gestion des propositions DAO est considérée comme finalisée. Ce document servira de guide pour l'implémentation future.
