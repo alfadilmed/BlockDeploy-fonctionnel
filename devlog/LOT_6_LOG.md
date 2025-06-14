@@ -452,3 +452,24 @@
     - **Récupération des Données :** Spécification des besoins API pour peupler ces vues (endpoints pour lister les DAOs de l'utilisateur et pour obtenir les détails d'une DAO spécifique, données attendues).
     - **Wireframes / Maquettes ASCII :** Illustrations textuelles de la section "Mes DAOs" et de la page de "Détail de la DAO" avec sa structure à onglets.
 - Statut: La phase de conception conceptuelle pour l'intégration des DAOs au dashboard et leur suivi est considérée comme finalisée. Ce document servira de guide pour l'implémentation frontend.
+
+---
+
+**L6-M7: Tests Backend et Documentation API Finale DAO Builder**
+- Date: 2025-06-07T18:30:00+00:00 (Heure indicative de finalisation)
+- Avancement: Terminé (pour les fonctionnalités implémentées).
+- Description des Accomplissements:
+  - Identification des composants backend clés pour la fonctionnalité de création de DAO (L6-M2), notamment `DaoCreationService`, `DaoRepositoryService`, et `DaoController`.
+  - Reconnaissance que les fonctionnalités backend pour la gestion des propositions (prévues pour L6-M3) ne sont pas encore implémentées et, par conséquent, les tests et la documentation API pour ces aspects sont en attente.
+  - **Définition Conceptuelle des Tests Backend (pour Création DAO) :**
+    - **Tests Unitaires :**
+        - `DaoController`: Vérification de la bonne invocation du `DaoCreationService`, gestion des DTOs, et réponses HTTP.
+        - `DaoCreationService`: Tests de la logique de validation (ex: `threshold` vs `owners.length`), interaction correcte avec `ConfigService` (pour adresses factory/singleton), `ProviderService` (pour interaction blockchain), et `DaoRepositoryService` (pour persistance). Simulation (mocking) des dépendances externes.
+        - `DaoRepositoryService`: Tests des opérations CRUD de base pour les entités DAO (simulation de la base de données).
+    - **Tests d'Intégration :**
+        - Test du flux complet de l'API `POST /api/v1/dao/multisig` depuis la requête HTTP jusqu'à la simulation de l'interaction avec la blockchain ( déploiement du proxy Safe) et la persistance en base de données. Utilisation de mocks pour les appels réels à la blockchain (ex: `ethers.js` interactions).
+  - **Mise à Jour de la Documentation API :**
+    - Ajout de la documentation détaillée pour l'endpoint de création de DAO `POST /api/v1/dao/multisig` au fichier `docs/api/API_DOCUMENTATION.md`.
+    - Cette documentation inclut la description de l'endpoint, les paramètres de la requête (`DaoCreationRequestDto`), les exemples de corps de requête, les réponses de succès (avec `daoId`, `daoAddress`, `deploymentTxHash`), et les codes d'erreur courants avec exemples.
+    - Une note a été ajoutée dans la documentation API pour indiquer que les endpoints relatifs à la gestion des propositions DAO (L6-M3) seront documentés une fois leur implémentation backend finalisée.
+- Statut: La tâche L6-M7 est considérée comme finalisée pour les fonctionnalités de création de DAO (L6-M2). Les tests et la documentation pour la gestion des propositions (L6-M3) seront abordés lorsque cette milestone sera implémentée.

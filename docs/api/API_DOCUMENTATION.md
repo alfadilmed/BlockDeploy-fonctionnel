@@ -629,3 +629,86 @@ The following endpoints allow authenticated users to perform actions on ERC-721 
 *   **Error Responses:**
     *   `400 Bad Request`: Invalid request body (e.g., missing fields, invalid address/tokenId format, contract is paused).
     *   `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`.
+
+---
+
+## Endpoints du DAO Builder (Lot 6)
+
+### 1. Créer une nouvelle DAO Multisig (Safe)
+
+*   **Endpoint:** `POST /api/v1/dao/multisig`
+*   **Méthode:** `POST`
+*   **Description:** Initie la création et le déploiement d'une nouvelle DAO de type multisignature (basée sur Gnosis Safe). L'appelant authentifié sera enregistré comme le créateur.
+*   **Authentification:** Requise (Bearer Token JWT).
+*   **Corps de la Requête (`DaoCreationRequestDto`):**
+    ```json
+    {
+      "name": "Ma DAO Communautaire",
+      "network": "sepolia",
+      "owners": [
+        "0xOwnerAddress1...",
+        "0xOwnerAddress2...",
+        "0xOwnerAddress3..."
+      ],
+      "threshold": 2
+    }
+    ```
+    *   `name` (string, requis): Nom donné par l'utilisateur à la DAO (pour identification dans BlockDeploy).
+    *   `network` (string, requis): Identifiant du réseau sur lequel déployer la DAO (ex: "sepolia", "polygon", "mainnet"). Les réseaux supportés dépendent de la configuration backend.
+    *   `owners` (array de strings, requis, min 1 élément): Liste des adresses Ethereum qui seront les propriétaires initiaux du Safe. Chaque adresse doit être valide.
+    *   `threshold` (number, requis): Nombre minimum de signatures de propriétaires requis pour approuver une transaction. Doit être un entier positif inférieur ou égal au nombre total de propriétaires.
+*   **Réponse Succès (`201 CREATED`):**
+    ```json
+    {
+      "success": true,
+      "daoId": "c1a9b8d7-0e1f-4c2a-b6d0-f1e2d3c4b5a6", // ID de la DAO dans la base de données BlockDeploy
+      "daoAddress": "0xNewlyDeployedSafeProxyAddress...",
+      "network": "sepolia",
+      "deploymentTxHash": "0xTransactionHashForProxyDeployment...",
+      "message": "DAO 'Ma DAO Communautaire' creation initiated successfully on network 'sepolia' at address 0xNewlyDeployedSafeProxyAddress.... DAO ID: c1a9b8d7-..."
+    }
+    ```
+    *   `success` (boolean): Indique le succès de l'initiation.
+    *   `daoId` (string): L'identifiant unique de la DAO enregistrée dans la base de données de BlockDeploy.
+    *   `daoAddress` (string): L'adresse du contrat Safe (proxy) nouvellement déployé.
+    *   `network` (string): Le réseau sur lequel la DAO a été déployée.
+    *   `deploymentTxHash` (string): Le hash de la transaction de déploiement du contrat proxy Safe.
+    *   `message` (string): Message de confirmation.
+*   **Réponses d'Erreur Courantes:**
+    *   `400 Bad Request`: Données d'entrée invalides (ex: `threshold` incorrect, adresses `owners` malformées, `network` non supporté ou non configuré, `name` manquant).
+        ```json
+        {
+          "statusCode": 400,
+          "message": [
+            "threshold must be a positive number",
+            "owners must contain at least 1 valid Ethereum addresses"
+          ],
+          "error": "Bad Request"
+        }
+        ```
+    *   `401 Unauthorized`: Token d'authentification manquant ou invalide.
+    *   `404 Not Found`: Si le `network` spécifié n'est pas configuré pour la création de DAO (par exemple, adresses de contrats Safe mastercopy/factory manquantes pour ce réseau).
+        ```json
+        {
+          "statusCode": 404,
+          "message": "DAO creation is not supported or configured for network: invalid_network",
+          "error": "Not Found"
+        }
+        ```
+    *   `500 Internal Server Error`: Erreur inattendue durant le processus de déploiement (ex: échec de communication avec le noeud blockchain, erreur lors de l'interaction avec le contrat factory).
+        ```json
+        {
+          "statusCode": 500,
+          "message": "Failed to create DAO: Reason for failure from service layer",
+          "error": "Internal Server Error"
+        }
+        ```
+
+---
+### 2. Gestion des Propositions DAO (À Implémenter)
+
+*   **Note:** Les endpoints pour la gestion des propositions (soumission, confirmation, exécution, listage) sont planifiés (L6-M3) mais pas encore implémentés dans le backend. Leur documentation sera ajoutée ici une fois qu'ils seront disponibles.
+    *   `POST /api/v1/dao/multisig/:network/:daoAddress/proposals`
+    *   `GET /api/v1/dao/multisig/:network/:daoAddress/proposals`
+    *   `POST /api/v1/dao/multisig/:network/:daoAddress/proposals/:proposalIdOrTxHash/confirmations`
+    *   `POST /api/v1/dao/multisig/:network/:daoAddress/proposals/:proposalIdOrTxHash/execute`
