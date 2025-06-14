@@ -59,7 +59,7 @@
   - **Contrat de Base Confirmé:** Gnosis Safe / Safe{Core} est confirmé comme la base pour le MVP DAO Builder, en accord avec la recherche préliminaire et le feedback utilisateur.
   - **Méthode d'Utilisation:** Déploiement d'instances de contrats Gnosis Safe pour chaque DAO utilisateur, via le contrat `SafeProxyFactory.sol` (ou équivalent Safe{Core}). Cette approche utilise des proxies pointant vers une mastercopy de `Safe.sol`.
   - **Points à Préciser (pour L6-M1.2 et L6-M1.4):**
-    - **Version des Contrats Safe:** Utiliser une version récente, stable et auditée (ex: v1.3.0 ou version Safe{Core} recommandée).
+    - **Version des Contrats Safe:** Utiliser une version recente, stable et auditée (ex: v1.3.0 ou version Safe{Core} recommandée).
     - **Instances des Contrats:** Privilégier l'utilisation des instances officielles des factories et mastercopies Gnosis Safe sur les réseaux cibles.
   - **Prochaines Étapes:** Identifier les contrats et fonctions spécifiques de Gnosis Safe à utiliser (L6-M1.2) et collecter les ABIs/adresses (L6-M1.4).
 
@@ -433,3 +433,22 @@
     - **Wireframes / Maquettes ASCII :** Représentations textuelles de la page de propositions et de la modale de création.
     - **États et Feedback Utilisateur :** Stratégies pour gérer les états de chargement, les notifications de succès, les messages d'erreur (validation, signature, transaction, API), et autres indications visuelles.
 - Statut: La phase de conception conceptuelle pour l'interface de gestion des propositions DAO est considérée comme finalisée. Ce document servira de guide pour l'implémentation future.
+
+---
+
+**L6-M4.3 & L6-M6: Frontend - Intégration Dashboard et Suivi des DAOs (Conceptuel)**
+- Date: 2025-06-07T18:15:00+00:00 (Heure indicative de finalisation)
+- Avancement: Terminé.
+- Description des Accomplissements:
+  - Création et remplissage du document de conception UI/UX `docs/ui_ux/L6_M4_3_DAO_DASHBOARD_INTEGRATION.md`.
+  - Ce document fusionne les aspects de visualisation des DAOs créées (L6-M4.3) et leur intégration plus large dans le dashboard pour le suivi (L6-M6).
+  - Le document détaille conceptuellement :
+    - **Section "Mes DAOs" dans le Dashboard Principal :** Comment les DAOs de l'utilisateur (créées ou dont il est membre) sont listées (format carte), les informations clés affichées par DAO (nom, adresse, réseau, config M/N, indicateur d'activité optionnel), et les interactions (clic pour détail, actions rapides optionnelles).
+    - **Page de "Détail de la DAO" :** Accessible via la liste "Mes DAOs", cette page propose une vue complète d'une DAO sélectionnée. Elle inclut un en-tête avec les informations d'identification de la DAO (nom, adresse, réseau, solde optionnel) et une structure de navigation par onglets :
+        - **Onglet "Aperçu" :** Résumé des informations vitales (configuration, liste des propriétaires, activité récente optionnelle).
+        - **Onglet "Propositions" :** Intégration de l'interface de gestion des propositions définie dans `L6_M5_DAO_PROPOSAL_MANAGEMENT_UI.md`.
+        - **Onglet "Membres" :** Vue détaillée des propriétaires et raccourcis pour proposer des ajouts/retraits.
+        - **Onglet "Paramètres de la DAO" :** Vue du seuil et raccourci pour proposer des modifications.
+    - **Récupération des Données :** Spécification des besoins API pour peupler ces vues (endpoints pour lister les DAOs de l'utilisateur et pour obtenir les détails d'une DAO spécifique, données attendues).
+    - **Wireframes / Maquettes ASCII :** Illustrations textuelles de la section "Mes DAOs" et de la page de "Détail de la DAO" avec sa structure à onglets.
+- Statut: La phase de conception conceptuelle pour l'intégration des DAOs au dashboard et leur suivi est considérée comme finalisée. Ce document servira de guide pour l'implémentation frontend.
