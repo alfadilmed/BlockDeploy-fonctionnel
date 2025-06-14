@@ -1,4 +1,3 @@
-
 ## Lot 6 Planification Log - 2025-06-07T16:13:29+00:00
 
 **Analyser `PHASE_1_CONSOLIDATED_PLAN.md` (Axe 6) et les Priorités Utilisateur pour le MVP DAO Builder**
@@ -382,3 +381,39 @@
     - Utilisation de `@HttpCode(HttpStatus.CREATED)`.
   - Application d'un `@UseGuards(AuthGuard('jwt'))` (placeholder) au contrôleur.
   - Mise à jour de `DaoModule.ts` pour inclure `DaoController` (corrigé avec overwrite_file_with_block).
+
+---
+
+**L6-M4.2: Frontend - Intégration API Création DAO (Safe)**
+- Date: 2025-06-07T17:45:00+00:00 (Heure indicative de finalisation)
+- Avancement: Terminé.
+- Description des Accomplissements:
+  - Identification du composant `pages/wizard/WizardConfigPage.tsx` comme étant le formulaire principal pour la configuration des contrats, y compris les DAOs.
+  - Modification des champs du formulaire pour le type de contrat `ContractType.DAO` pour inclure :
+    - `daoName`: Nom de la DAO (pour affichage et suivi dans BlockDeploy).
+    - `owners`: Adresses des propriétaires initiaux (entrées comme une chaîne de caractères séparée par des virgules).
+    - `threshold`: Seuil de signature requis (M parmi N propriétaires).
+    - `network`: Réseau cible pour le déploiement de la DAO (ex: 'sepolia', 'polygon').
+  - Implémentation de la validation robuste pour les champs spécifiques à la DAO :
+    - `owners`: Doit contenir au moins une adresse, et chaque adresse doit être une adresse Ethereum valide (format `0x...`).
+    - `threshold`: Doit être un entier positif et ne pas dépasser le nombre total de propriétaires.
+    - `network`: Ne doit pas être vide.
+  - Connexion du formulaire de création DAO à l'endpoint API backend `POST /api/v1/dao/multisig`.
+  - Gestion de la requête API :
+    - Construction du payload JSON avec les champs `owners` (transformés en tableau d'adresses), `threshold` (converti en nombre), et `network`.
+    - Ajout d'un placeholder pour l'en-tête `Authorization: Bearer <token>` (récupération du token depuis `localStorage`).
+  - Traitement de la réponse API en cas de succès :
+    - Récupération des données `safeAddress` (adresse du contrat Safe déployé), `txHash` (hash de la transaction de déploiement), et `daoId` (identifiant interne de la DAO dans BlockDeploy).
+  - Stockage structuré des résultats de la création dans le contexte du wizard (`wizardData.deploymentResult`) :
+    - `safeAddress`, `txHash`, `daoId`.
+    - `name` (le `daoName` fourni par l'utilisateur).
+    - `network` (le réseau de déploiement).
+    - `contractType` (explicitement `ContractType.DAO`).
+    - Ces données sont ensuite utilisées par `WizardSuccessPage.tsx` pour afficher un résumé de la création.
+  - Gestion des états de chargement pendant l'appel API :
+    - Un indicateur de chargement textuel ("Creating DAO, please wait...") est affiché.
+    - Les boutons de navigation ("Back", "Next") sont désactivés pour prévenir les actions multiples.
+  - Gestion des erreurs provenant de l'API :
+    - Les messages d'erreur retournés par l'API (ex: validation échouée, échec de déploiement) sont affichés à l'utilisateur.
+    - Une gestion des erreurs réseau génériques est également en place.
+- Statut: Cette tâche est considérée comme finalisée. Les modifications apportées à `WizardConfigPage.tsx` permettent une création de DAO fonctionnelle via l'interface utilisateur, avec un retour d'information adéquat à l'utilisateur.

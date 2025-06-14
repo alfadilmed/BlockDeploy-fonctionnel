@@ -26,12 +26,12 @@ const getFieldsForTemplate = (templateName?: ContractType) => {
         { id: 'baseURI', label: 'Base URI (for metadata)', placeholder: 'ipfs://your_folder_cid/', required: false },
       ];
     case ContractType.DAO:
-        return [
-            { id: 'daoName', label: 'DAO Name', placeholder: 'e.g., My Community DAO', required: true },
-            { id: 'votingTokenAddress', label: 'Voting Token Address (Optional)', placeholder: '0x...', required: false },
-            { id: 'votingPeriod', label: 'Voting Period (days)', type: 'number', placeholder: 'e.g., 7', required: true },
-            { id: 'quorumPercentage', label: 'Quorum (% required to pass)', type: 'number', placeholder: 'e.g., 51', required: true },
-        ];
+      return [
+        { id: 'daoName', label: 'DAO Name', placeholder: 'e.g., My Community DAO', required: true },
+        { id: 'owners', label: 'Owner Addresses (comma-separated)', placeholder: '0xaddress1,0xaddress2,...', required: true },
+        { id: 'threshold', label: 'Signature Threshold', type: 'number', placeholder: 'e.g., 2', required: true },
+        { id: 'network', label: 'Network (e.g., sepolia, polygon)', placeholder: 'sepolia', required: true },
+      ];
     default:
       return [{ id: 'customParam', label: 'Custom Parameter', placeholder: 'Enter value' }];
   }
@@ -43,6 +43,8 @@ const WizardConfigPage: React.FC = () => {
   const { wizardData, updateWizardData, selectedTemplate } = useWizardContext();
   const [formState, setFormState] = useState<Record<string, any>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const currentStepIndex = WIZARD_STEPS_CONFIG.findIndex(step => step.id === 'config');
 
@@ -75,6 +77,9 @@ const WizardConfigPage: React.FC = () => {
     if (errors[id]) {
       setErrors(prev => ({...prev, [id]: ''}));
     }
+    if (apiError) {
+      setApiError(null);
+    }
   };
 
   const validateForm = () => {
@@ -83,17 +88,116 @@ const WizardConfigPage: React.FC = () => {
       if (field.required && (!formState[field.id] || formState[field.id].toString().trim() === '')) {
         newErrors[field.id] = `${field.label} is required.`;
       }
-      // Add more specific validations here if needed
-      if (field.type === 'number' && formState[field.id] && isNaN(Number(formState[field.id]))) {
-        newErrors[field.id] = `${field.label} must be a number.`;
+      // Specific validation for number fields that are not DAO threshold
+      if (field.type === 'number' && field.id !== 'threshold' && formState[field.id] && (isNaN(Number(formState[field.id])) || Number(formState[field.id]) <= 0)) {
+        newErrors[field.id] = `${field.label} must be a positive number.`;
       }
     });
+
+    if (selectedTemplate?.name === ContractType.DAO) {
+      // DAO specific validations
+      const ownersValue = formState.owners || '';
+      const owners = ownersValue.split(',').map((addr: string) => addr.trim()).filter((addr: string) => addr !== '');
+      if (owners.length === 0) {
+        newErrors.owners = 'At least one owner address is required.';
+      } else {
+        const invalidAddresses = owners.filter((addr: string) => !/^0x[a-fA-F0-9]{40}$/.test(addr));
+        if (invalidAddresses.length > 0) {
+          newErrors.owners = `Invalid Ethereum address format for: ${invalidAddresses.join(', ')}. Ensure addresses are comma-separated.`;
+        }
+      }
+
+      const thresholdValue = formState.threshold;
+      if (thresholdValue === undefined || thresholdValue === null || thresholdValue.toString().trim() === '') {
+        newErrors.threshold = 'Signature Threshold is required.';
+      } else {
+        const thresholdNum = parseInt(thresholdValue, 10);
+        if (isNaN(thresholdNum) || thresholdNum <= 0) {
+          newErrors.threshold = 'Signature Threshold must be a positive integer.';
+        } else if (owners.length > 0 && thresholdNum > owners.length) {
+          newErrors.threshold = 'Signature Threshold cannot be greater than the number of owners.';
+        }
+      }
+
+      if (!formState.network || formState.network.trim() === '') {
+        newErrors.network = 'Network is required.';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = () => {
-    if (validateForm()) {
+  const handleNext = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    if (selectedTemplate?.name === ContractType.DAO) {
+      setLoading(true);
+      setApiError(null);
+
+      const ownersArray = formState.owners.split(',').map((owner: string) => owner.trim()).filter((owner: string) => owner);
+      const thresholdInt = parseInt(formState.threshold, 10);
+
+      // This check is also in validateForm, but good to have a specific guard here before API call
+      if (isNaN(thresholdInt)) {
+        setErrors(prev => ({...prev, threshold: 'Invalid threshold value. Must be a number.'}));
+        setLoading(false);
+        return;
+      }
+
+      const apiRequestBody = {
+        owners: ownersArray,
+        threshold: thresholdInt,
+        network: formState.network,
+        // daoName is not sent in the request body for this specific API
+      };
+
+      try {
+        // TODO: Retrieve actual token if authentication is implemented
+        const authToken = localStorage.getItem('jwtToken'); // Example: replace with actual token retrieval
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`;
+        }
+
+        const response = await fetch('/api/v1/dao/multisig', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(apiRequestBody),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          updateWizardData({
+            config: formState, // Keep the current form config
+            deploymentResult: {
+              safeAddress: result.safeAddress, // from API
+              txHash: result.txHash,      // from API
+              daoId: result.daoId,       // from API
+              name: formState.daoName, // from form
+              network: formState.network, // from form
+              contractType: selectedTemplate.name, // Should be ContractType.DAO
+              // Any other fields needed by WizardSuccessPage can be added here
+              // or handled by default in WizardSuccessPage if not present.
+            }
+          });
+          navigate(WIZARD_STEPS_CONFIG[currentStepIndex + 1]?.path || '/dashboard');
+        } else {
+          const errorData = await response.json().catch(() => ({ message: 'DAO creation failed. Invalid JSON response.' }));
+          setApiError(errorData.message || `DAO creation failed. Status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error('DAO Creation API call failed:', error);
+        setApiError('DAO creation failed due to a network or unexpected error. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Handle other contract types
       updateWizardData({ config: formState });
       navigate(WIZARD_STEPS_CONFIG[currentStepIndex + 1]?.path || '/dashboard');
     }
@@ -130,14 +234,20 @@ const WizardConfigPage: React.FC = () => {
               required={field.required}
             />
           ))}
+          {selectedTemplate.name === ContractType.DAO && (
+            <div className="mt-4">
+              {loading && <p className="text-brand-accent-blue">Creating DAO, please wait...</p>}
+              {apiError && <p className="text-red-500">{apiError}</p>}
+            </div>
+          )}
         </form>
       </div>
       <div className="mt-8 flex justify-between">
-        <Button variant="outline" onClick={handleBack}>
+        <Button variant="outline" onClick={handleBack} disabled={loading}>
           Back
         </Button>
-        <Button variant="primary" onClick={handleNext} glowEffect="blue">
-          Next: Choose Network
+        <Button variant="primary" onClick={handleNext} disabled={loading} glowEffect={loading ? undefined : "blue"}>
+          {loading ? 'Processing...' : 'Next: Choose Network'}
         </Button>
       </div>
     </div>

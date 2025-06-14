@@ -9,20 +9,27 @@ import { CheckCircle, Copy, ExternalLink, PartyPopper } from 'lucide-react';
 
 const WizardSuccessPage: React.FC = () => {
   const navigate = useNavigate();
-  const { wizardData, selectedTemplate, resetWizard } = useWizardContext();
+  const { wizardData, resetWizard } = useWizardContext(); // Removed selectedTemplate as deploymentResult has more accurate info
 
   const currentStepIndex = WIZARD_STEPS_CONFIG.findIndex(step => step.id === 'success');
   
-  // Mock contract address and explorer link
-  const mockContractAddress = `0x${[...Array(40)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')}`;
-  const networkExplorerBaseUrl = wizardData.network?.toLowerCase().includes('ethereum') ? 'https://etherscan.io/address/' : 
-                                 wizardData.network?.toLowerCase().includes('polygon') ? 'https://polygonscan.com/address/' :
-                                 wizardData.network?.toLowerCase().includes('bnb') ? 'https://bscscan.com/address/' :
+  const deploymentResult = wizardData.deploymentResult;
+  const isDaoDeployment = deploymentResult?.contractType === 'DAO';
+
+  // Determine contract address and name from deploymentResult or fallbacks
+  const contractAddress = deploymentResult?.safeAddress || deploymentResult?.contractAddress || `0x${[...Array(40)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+  const displayName = deploymentResult?.name || deploymentResult?.contractType || 'Your contract';
+  const networkName = deploymentResult?.network || 'the selected network';
+
+  const networkExplorerBaseUrl = networkName?.toLowerCase().includes('ethereum') || networkName?.toLowerCase().includes('sepolia') ? 'https://sepolia.etherscan.io/address/' :
+                                 networkName?.toLowerCase().includes('polygon') ? 'https://polygonscan.com/address/' :
+                                 networkName?.toLowerCase().includes('bnb') || networkName?.toLowerCase().includes('bsc') ? 'https://bscscan.com/address/' :
                                  '#'; // Fallback
 
-  const explorerLink = `${networkExplorerBaseUrl}${mockContractAddress}`;
+  const explorerLink = `${networkExplorerBaseUrl}${contractAddress}`;
 
   const copyToClipboard = (text: string) => {
+    if (!text) return;
     navigator.clipboard.writeText(text).then(() => {
       alert('Copied to clipboard!'); // Replace with a proper toast notification
     }).catch(err => {
@@ -34,19 +41,19 @@ const WizardSuccessPage: React.FC = () => {
     // Typically, you wouldn't reset the wizard immediately here
     // but after the user navigates away or starts a new deployment.
     // For this example, we'll keep the data for display.
-    // resetWizard(); // Uncomment if you want to clear data on viewing this page.
+    // resetWizard(); // Consider when to reset, e.g., on "Deploy Another" or "View My Deployments"
     
-    // Redirect if crucial data is missing (e.g., user landed here directly)
-    if (!selectedTemplate || !wizardData.config || !wizardData.network) {
+    // Redirect if deploymentResult is missing (e.g., user landed here directly)
+    if (!deploymentResult) {
+      console.warn('No deployment result found in wizardData, redirecting to start.');
       navigate(WIZARD_STEPS_CONFIG[0].path);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [deploymentResult, navigate]);
 
-  if (!selectedTemplate || !wizardData.config || !wizardData.network) {
+  if (!deploymentResult) {
     return <div className="text-center p-8">Loading deployment details or redirecting...</div>;
   }
-
 
   return (
     <div className="max-w-2xl mx-auto text-center">
@@ -64,24 +71,49 @@ const WizardSuccessPage: React.FC = () => {
         <CheckCircle size={64} className="mx-auto mb-6 text-green-500" />
         <h1 className="text-3xl font-bold text-white mb-3">Deployment Successful!</h1>
         <p className="text-slate-300 mb-6">
-          Your <strong>{selectedTemplate.name}</strong> contract has been successfully deployed on the <strong>{wizardData.network}</strong> network.
+          Your <strong>{displayName}</strong> contract has been successfully deployed on the <strong>{networkName}</strong> network.
         </p>
 
-        <div className="bg-slate-800 p-4 rounded-lg mb-6 border border-slate-700">
-          <p className="text-sm text-slate-400 mb-1">Contract Address:</p>
-          <div className="flex items-center justify-between">
-            <code className="text-brand-accent-blue text-sm break-all">{mockContractAddress}</code>
-            <Button variant="ghost" size="sm" onClick={() => copyToClipboard(mockContractAddress)} className="ml-2">
-              <Copy size={16} />
-            </Button>
+        <div className="bg-slate-800 p-4 rounded-lg mb-6 border border-slate-700 text-left">
+          {isDaoDeployment && deploymentResult.daoId && (
+            <div className="mb-3">
+              <p className="text-sm text-slate-400 mb-0.5">DAO ID:</p>
+              <div className="flex items-center justify-between">
+                <code className="text-slate-300 text-sm break-all">{deploymentResult.daoId}</code>
+                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(deploymentResult.daoId)} className="ml-2 text-slate-400 hover:text-brand-accent-blue">
+                  <Copy size={16} />
+                </Button>
+              </div>
+            </div>
+          )}
+          <div className="mb-3">
+            <p className="text-sm text-slate-400 mb-0.5">{isDaoDeployment ? 'Safe Address (DAO Contract):' : 'Contract Address:'}</p>
+            <div className="flex items-center justify-between">
+              <code className="text-brand-accent-blue text-sm break-all">{contractAddress}</code>
+              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(contractAddress)} className="ml-2 text-slate-400 hover:text-brand-accent-blue">
+                <Copy size={16} />
+              </Button>
+            </div>
           </div>
+          {isDaoDeployment && deploymentResult.txHash && (
+            <div>
+              <p className="text-sm text-slate-400 mb-0.5">Deployment Transaction Hash:</p>
+              <div className="flex items-center justify-between">
+                <code className="text-slate-300 text-sm break-all">{deploymentResult.txHash}</code>
+                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(deploymentResult.txHash)} className="ml-2 text-slate-400 hover:text-brand-accent-blue">
+                  <Copy size={16} />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="space-y-3 sm:space-y-0 sm:flex sm:justify-center sm:space-x-4">
             <Button 
               variant="primary" 
               glowEffect="blue"
-              onClick={() => window.open(explorerLink, '_blank')}
+              onClick={() => explorerLink !== '#' && contractAddress && window.open(explorerLink, '_blank')}
+              disabled={explorerLink === '#' || !contractAddress}
               iconRight={<ExternalLink size={16}/>}
             >
               View on Explorer
@@ -89,7 +121,7 @@ const WizardSuccessPage: React.FC = () => {
             <Button 
               variant="outline" 
               onClick={() => {
-                resetWizard();
+                resetWizard(); // Reset wizard state before navigating
                 navigate('/dashboard/deployments');
               }}
             >
