@@ -4,11 +4,31 @@
 
 ## 1. Contexte et Justification
 
-*(À compléter : Importance de cette fonctionnalité pour BlockDeploy, public cible, valeur ajoutée.)*
+La Phase 1 de BlockDeploy a établi une plateforme robuste pour le déploiement de smart contracts (ERC-20, NFT, DAOs). Cependant, pour de nombreux utilisateurs, en particulier ceux moins techniques, la création d'une interface utilisateur (frontend) pour interagir avec ces contrats reste un obstacle majeur. Un constructeur de dApp frontend "Drag & Drop" vise à combler ce fossé.
+
+**Importance pour BlockDeploy:**
+- **Démocratisation de la création de dApps:** Abaisser la barrière à l'entrée pour la création d'applications Web3 complètes.
+- **Valeur ajoutée à l'écosystème:** Permettre aux utilisateurs de BlockDeploy de passer du déploiement de contrat à une dApp fonctionnelle sans quitter la plateforme.
+- **Différenciation concurrentielle:** Offrir un outil intégré qui simplifie un aspect complexe du développement Web3.
+
+**Public Cible:**
+- Utilisateurs non-développeurs ou peu techniques souhaitant créer des interfaces simples pour leurs contrats.
+- Développeurs cherchant à prototyper rapidement des frontends pour leurs smart contracts.
+- Projets communautaires ou petites entreprises voulant une présence Web3 interactive sans investir massivement dans du développement frontend custom.
+
+**Valeur Ajoutée:**
+- Réduction du temps et des coûts de développement frontend pour des cas d'usage courants.
+- Autonomisation des utilisateurs pour la création de leurs propres outils et vitrines Web3.
+- Augmentation de l'engagement et de l'utilisation des contrats déployés via BlockDeploy.
 
 ## 2. Objectifs Spécifiques du Lot
 
-- *(À compléter)*
+- Réaliser une étude de marché et une analyse comparative pour informer la conception et le positionnement du constructeur de dApp.
+- Définir un périmètre MVP clair et réalisable pour la première version du constructeur, en se concentrant sur les cas d'usage clés et les fonctionnalités essentielles.
+- Établir une conception architecturale solide pour le constructeur et les dApps générées, en choisissant les technologies et librairies appropriées.
+- Produire une conception UI/UX détaillée et intuitive pour l'interface du constructeur de dApp.
+- Décrire conceptuellement les étapes d'initialisation technique du projet frontend, préparant le terrain pour la phase de développement.
+- Produire toute la documentation conceptuelle nécessaire (spécifications, architecture, design) pour guider l'implémentation future.
 
 ## 3. Milestones Suggérées (Jalons)
 
@@ -48,13 +68,66 @@
         - Production de wireframes ou maquettes ASCII pour illustrer les écrans principaux.
     - **Livrable:** Document de design UI/UX: `docs/phase_2/ui_ux/P2_L1_M4_DAPP_BUILDER_UI_UX.md`.
 - **P2-L1-M5 : Initialisation Technique du Projet Frontend (Implémentation de Base)**
-    - *(Détails à compléter)*
+    - **Description:** Mettre en place la structure de base du projet ou module frontend pour le constructeur de dApp. Installer et configurer les dépendances techniques majeures identifiées lors de la conception architecturale.
+    - **Activités (Conceptuelles pour cette phase de planification):**
+        - **Choix de l'emplacement du code:**
+            - Option A: Nouveau projet/repository dédié spécifiquement au constructeur de dApp.
+            - Option B: Nouveau module au sein de l'application frontend BlockDeploy existante (si l'architecture le permet et si cela facilite la réutilisation des composants UI et services existants).
+            - *Décision Prise (Simulée):* Intégration comme nouveau module dans le frontend BlockDeploy existant pour bénéficier des composants UI, du routing et des services d'authentification.
+        - **Initialisation du Module/Projet:**
+            - Création de la structure de dossiers de base pour le module du constructeur (ex: `src/modules/dapp-builder/`, contenant `core/` pour la logique du canvas, `components/` pour les éléments Drag & Drop, `editor-ui/` pour l'interface du builder, `state/` pour la gestion d'état).
+        - **Installation des Dépendances Clés (via `npm` ou `yarn`):**
+            - React, Vite (si applicable, ou configuration existante).
+            - Librairie Drag & Drop: `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`.
+            - Gestion d'état: `zustand` (ou Redux Toolkit si préféré).
+            - Librairie d'interaction Web3: `ethers` (version 5 ou 6, selon standard projet) ou `viem`.
+            - Autres utilitaires (ex: `clsx` pour classes conditionnelles, `lucide-react` pour icônes).
+        - **Configuration Initiale:**
+            - Configuration de base pour TypeScript (`tsconfig.json` adapté si besoin).
+            - Configuration de base pour ESLint/Prettier.
+            - Mise en place du routing de base pour accéder à l'interface du constructeur (ex: `/dapp-builder/:projectId`).
+        - **Création de Composants "Placeholder" pour les Zones Principales:**
+            - Un composant squelette pour le `CanvasArea`.
+            - Un composant squelette pour la `ComponentPalette`.
+            - Un composant squelette pour le `PropertiesPanel`.
+            - Un composant squelette pour la `MainEditorLayout` qui agence ces zones.
+    - **Livrable (Conceptuel):** Description des étapes d'initialisation. Aucun code n'est produit à ce stade de planification du Lot 1. Le livrable réel (code) sera produit lors de l'implémentation effective de P2-L1.
 - **P2-L1-M6 : Documentation Initiale et Planification P2-L2**
-    - *(Détails à compléter)*
+    - **Description:** Finaliser la documentation conceptuelle pour P2-L1 et esquisser les grandes lignes pour le lot suivant (P2-L2), qui se concentrera sur le développement des premiers composants et fonctionnalités du constructeur de dApp.
+    - **Activités:**
+        - S'assurer que tous les documents de P2-L1 (étude de marché, périmètre MVP, architecture, UI/UX, initialisation technique) sont complets et cohérents.
+        - Remplir les sections restantes du présent document de planification P2-L1 (`Contexte et Justification`, `Objectifs Spécifiques`, `Fonctionnalités Clés MVP`, `Critères de Succès`, `Risques`).
+        - Créer une ébauche du document de planification pour P2-L2 (`docs/phase_2/P2_L2_DAPP_BUILDER_CORE_DEV.md` - nom à confirmer), en listant les objectifs principaux (ex: développement du canvas, de la palette, des premiers composants Drag & Drop Web3 et UI, panneau de propriétés de base).
+        - Mettre à jour le `devlog/LOT_P2_L1_LOG.md` pour refléter la complétion de toutes les milestones de planification de P2-L1.
+    - **Livrable (Conceptuel):**
+        - Ce document (`P2_L1_DAPP_BUILDER_FOUNDATIONS.md`) complété.
+        - Ébauche du document de planification pour P2-L2.
+        - `devlog/LOT_P2_L1_LOG.md` finalisé pour P2-L1.
 
 ## 4. Fonctionnalités Clés du MVP du Constructeur de dApp
 
-*(À compléter sur la base de P2-L1-M2)*
+Les fonctionnalités clés du MVP sont détaillées dans le document `docs/phase_2/specs/P2_L1_M2_DAPP_BUILDER_MVP_SCOPE.md`. En résumé, elles incluent :
+
+- **Cas d'Usage Cibles:**
+    - Création de pages de présentation pour tokens ERC-20 (affichage d'infos, solde utilisateur).
+    - Création de pages de mint simples pour collections NFT ERC-721 existantes.
+    - Création d'interfaces de base pour des DAOs simples (affichage d'infos, liste de propositions en lecture seule).
+- **Composants "Drag & Drop" Web3 Essentiels:**
+    - Connexion/Déconnexion Wallet.
+    - Affichage d'Adresse Connectée, Sélecteur de Réseau.
+    - Lecteur de Données Contrat (pour fonctions `view`).
+    - Bouton d'Interaction Contrat (pour fonctions `write`).
+    - Affichage de Solde (ETH/ERC-20).
+    - Liste/Affichage de NFTs ERC-721.
+- **Composants UI Standards:**
+    - Texte, Titre, Image, Bouton, Conteneur, Champ de Saisie.
+- **Gestion des Smart Contracts:**
+    - Import simplifié des contrats déployés via BlockDeploy.
+    - Import de contrats externes via adresse et ABI (JSON).
+- **Publication et Hébergement:**
+    - Prévisualisation en direct.
+    - Export des fichiers statiques de la dApp.
+    - *Optionnel MVP:* Publication sur IPFS.
 
 ## 5. Dépendances
 
@@ -63,11 +136,25 @@
 
 ## 6. Critères de Succès du Lot
 
-- *(À compléter : Ex: Documents de conception validés, périmètre MVP clair, initialisation technique fonctionnelle.)*
+- Tous les documents de conception (étude de marché, périmètre MVP, architecture, UI/UX) sont produits, revus et considérés comme complets et suffisamment détaillés pour entamer une phase d'implémentation.
+- Le périmètre du MVP est clairement défini, validé, et jugé réalisable tout en apportant une valeur utilisateur significative.
+- Les choix technologiques clés pour l'architecture sont justifiés et documentés.
+- Les étapes pour l'initialisation technique du projet frontend sont clairement décrites.
+- Le présent document de planification (`P2_L1_DAPP_BUILDER_FOUNDATIONS.md`) est complété et validé.
+- Le devlog (`devlog/LOT_P2_L1_LOG.md`) est à jour et reflète toutes les activités de planification de ce lot.
 
 ## 7. Risques et Atténuations
 
-- *(À compléter)*
+- **Risque 1: Complexité technique sous-estimée pour le Drag & Drop et la gestion de l'état du canvas.**
+    - *Atténuation:* Choix de librairies robustes et éprouvées (@dnd-kit, Zustand). Prévoir des Proofs of Concept (PoC) techniques sur les aspects les plus complexes avant une implémentation à grande échelle (sera partie de P2-L2 ou d'un lot d'implémentation).
+- **Risque 2: Difficulté à maintenir une UX simple et intuitive face à la flexibilité requise.**
+    - *Atténuation:* Se concentrer sur les cas d'usage MVP. Itérer sur l'UX avec des maquettes et prototypes, et prévoir des tests utilisateurs tôt dans la phase de développement.
+- **Risque 3: Le périmètre du MVP est trop ambitieux ou pas assez pertinent pour les utilisateurs.**
+    - *Atténuation:* Baser le périmètre sur l'étude de marché (P2-L1-M1) et les retours utilisateurs potentiels. Commencer petit et itérer.
+- **Risque 4: Difficulté d'intégration avec différents types de wallets ou de contrats (ABI variés).**
+    - *Atténuation:* S'appuyer sur des standards (ethers.js, EIP-1193). Pour le MVP, limiter la complexité des interactions contractuelles supportées nativement par les composants. Fournir des mécanismes clairs pour la fourniture d'ABI.
+- **Risque 5: Performances du constructeur ou des dApps générées.**
+    - *Atténuation:* Choix de technologies performantes. Optimisations à prévoir lors de la phase de développement. Pour le MVP, la complexité des dApps générées sera limitée.
 
 ---
 *Ce document servira de guide pour le développement du Lot 1 de la Phase 2.*

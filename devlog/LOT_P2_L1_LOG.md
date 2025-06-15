@@ -103,4 +103,44 @@
     - La conception UI/UX vise une base intuitive pour le MVP, à affiner avec des tests utilisateurs.
     - L'accent est mis sur la clarté des parcours pour les cas d'usage MVP.
 
+---
+
+**Milestone P2-L1-M5: Initialisation Technique du Projet Frontend (Implémentation de Base)**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé (Conceptuellement)
+- Description des Actions:
+    - Description des étapes conceptuelles pour l'initialisation technique du projet/module frontend du constructeur de dApp.
+    - Choix simulé d'intégrer le constructeur comme un nouveau module dans le frontend BlockDeploy existant.
+    - Définition de la structure de dossiers de base pour ce module.
+    - Listage des dépendances clés à installer (ex: @dnd-kit, zustand, ethers/viem).
+    - Description de la configuration initiale (TypeScript, ESLint, routing de base).
+    - Planification de la création de composants placeholders pour les zones principales de l'interface du constructeur.
+    - Mise à jour du document de planification `P2_L1_DAPP_BUILDER_FOUNDATIONS.md` pour cette milestone.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `docs/phase_2/P2_L1_DAPP_BUILDER_FOUNDATIONS.md` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Cette milestone est purement conceptuelle dans le cadre de la planification de P2-L1.
+    - L'implémentation effective (création de code) se fera lors de la phase de développement de P2-L1.
+    - Le choix d'intégration dans le frontend existant vise à maximiser la réutilisation.
+
+---
+
+**Milestone P2-L1-M6: Documentation Initiale et Planification P2-L2**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé (Conceptuellement)
+- Description des Actions:
+    - Description des étapes conceptuelles pour finaliser la documentation de P2-L1 et préparer P2-L2.
+    - Confirmation que tous les documents de P2-L1 (étude marché, périmètre MVP, architecture, UI/UX, initialisation technique) sont considérés comme prêts pour cette phase de planification.
+    - Planification de la complétion des sections restantes du document `P2_L1_DAPP_BUILDER_FOUNDATIONS.md`.
+    - Planification de la création d'une ébauche pour le document de planification de P2-L2 (qui se concentrera sur le développement effectif des fonctionnalités du constructeur de dApp).
+    - Mise à jour du document de planification `P2_L1_DAPP_BUILDER_FOUNDATIONS.md` pour cette milestone.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `docs/phase_2/P2_L1_DAPP_BUILDER_FOUNDATIONS.md` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+    - *(Ébauche de `docs/phase_2/P2_L2_DAPP_BUILDER_CORE_DEV.md` sera créée conceptuellement dans une prochaine étape si validé)*
+- Notes / Décisions:
+    - Cette milestone marque la fin de la phase de conception et de planification détaillée pour P2-L1.
+    - La prochaine étape consistera à remplir les sections générales du document de planification P2-L1 avant de le soumettre.
+
 *(Les entrées de log seront ajoutées ici au fur et à mesure de l'avancement)*
