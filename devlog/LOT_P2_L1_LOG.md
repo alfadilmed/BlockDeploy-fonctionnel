@@ -209,6 +209,24 @@
     - Ce store servira de source de vérité unique pour l'état de l'interface de l'éditeur et de la dApp en cours de construction.
     - Des actions plus spécifiques (suppression, réorganisation de composants, gestion des pages) seront ajoutées ultérieurement.
 
+**Milestone P2-L1-M5.3: Initialisation du Store d'État (Zustand)**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Création du fichier `src/modules/dapp-builder/state/builderStore.ts`.
+    - Mise en place d'un store Zustand de base (`useBuilderStore`) pour gérer l'état du constructeur de dApp.
+    - Le store inclut des états initiaux pour `currentDApp`, `activePageId`, `selectedComponentId`, `isSaving`.
+    - Définition des actions initiales : `setCurrentDApp`, `setActivePage`, `addComponent`, `updateComponentProperties`, `setSelectedComponent`.
+    - Ajout d'une fonction d'exemple `initializeDemoDApp` pour faciliter les tests et la démonstration.
+    - Suppression du fichier `README.md` du répertoire `state` car remplacé par `builderStore.ts`.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/state/builderStore.ts` (créé)
+    - `src/modules/dapp-builder/state/README.md` (supprimé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Ce store servira de source de vérité unique pour l'état de l'interface de l'éditeur et de la dApp en cours de construction.
+    - Des actions plus spécifiques (suppression, réorganisation de composants, gestion des pages) seront ajoutées ultérieurement.
+
 **Milestone P2-L1-M5.4: Création des Composants "Placeholder" pour l'UI du Builder**
 - Date: $(date --iso-8601=seconds)
 - Avancement: Terminé
@@ -245,5 +263,81 @@
 - Notes / Décisions:
     - L'implémentation effective du routing se fera lors de l'intégration du module dans l'application principale.
     - Le choix de la structure exacte de la route (ex: avec ou sans `projectId` pour le MVP) sera finalisé à ce moment-là.
+
+**Milestone P2-L1-M6.1 (Impl): Amélioration de `CanvasArea.tsx` pour Rendu Dynamique**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Modification de `src/modules/dapp-builder/editor-ui/CanvasArea.tsx`.
+    - Ajout d'un `componentRegistry` pour mapper les `DndComponentType` à des composants React (actuellement des placeholders).
+    - La fonction `RenderDndComponent` utilise maintenant ce `componentRegistry` pour afficher le composant approprié en fonction de son type.
+    - `RenderDndComponent` gère récursivement l'affichage des enfants, spécifiquement pour les composants de type `DndComponentType.Container`.
+    - Ajout d'un `useEffect` dans `CanvasArea` pour appeler `initializeDemoDApp` (depuis `builderStore.ts`) au montage si aucune dApp n'est chargée, afin de peupler le canvas avec des données d'exemple.
+    - L'événement `onClick` sur `RenderDndComponent` utilise `e.stopPropagation()` pour améliorer la logique de sélection des composants.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/editor-ui/CanvasArea.tsx` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Le canvas peut maintenant afficher une structure de dApp simple basée sur les données du store Zustand.
+    - Les composants affichés sont encore des placeholders ; la prochaine étape consistera à créer les versions réelles de ces composants.
+
+**Milestone P2-L1-M6.2 (Impl): Création des Composants "Drag & Drop" de Base**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Création des premières versions réelles (basiques) de composants dans `src/modules/dapp-builder/components/`:
+        - `HeadingComponent.tsx`: Pour les titres (h1-h6) avec des options de style de base.
+        - `TextComponent.tsx`: Pour les paragraphes de texte avec des options de style de base.
+        - `ConnectWalletButtonComponent.tsx`: Un bouton avec une action placeholder pour la connexion de wallet.
+        - `ContainerComponent.tsx`: Un conteneur basique avec des options de layout flexbox et un placeholder visuel.
+    - Mise à jour du `componentRegistry` dans `src/modules/dapp-builder/editor-ui/CanvasArea.tsx` pour utiliser ces nouveaux composants réels au lieu des placeholders pour les types correspondants.
+    - Suppression du fichier `README.md` du répertoire `src/modules/dapp-builder/components/`.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/components/HeadingComponent.tsx` (créé)
+    - `src/modules/dapp-builder/components/TextComponent.tsx` (créé)
+    - `src/modules/dapp-builder/components/ConnectWalletButtonComponent.tsx` (créé)
+    - `src/modules/dapp-builder/components/ContainerComponent.tsx` (créé)
+    - `src/modules/dapp-builder/editor-ui/CanvasArea.tsx` (mis à jour)
+    - `src/modules/dapp-builder/components/README.md` (supprimé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Ces composants sont une première itération et seront enrichis (propriétés, style, logique Web3) par la suite.
+    - Le `CanvasArea` peut maintenant rendre une dApp de démo avec des composants un peu plus concrets.
+
+**Milestone P2-L1-M6.3 (Impl): Affinement de `PropertiesPanel.tsx` et Interaction Store**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Modification de `src/modules/dapp-builder/editor-ui/PropertiesPanel.tsx`.
+    - Implémentation d'éditeurs de propriétés spécifiques pour les types de composants `Heading`, `Text`, `ConnectWalletButton` et `Container`.
+    - Pour `Heading` et `Text`, des champs pour `content`, `fontSize`, `color`, `textAlign`, `fontWeight` (et `level` pour `Heading`) ont été ajoutés.
+    - Pour `ConnectWalletButton`, un champ pour `buttonText` a été ajouté.
+    - Pour `Container`, des champs pour `backgroundColor`, `padding` et `flexDirection` ont été ajoutés.
+    - La modification de ces champs appelle `updateComponentProperties` du `builderStore`, qui met à jour l'état du composant.
+    - Le `CanvasArea` (modifié précédemment) reflète ces changements grâce à la réactivité du store Zustand.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/editor-ui/PropertiesPanel.tsx` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Le panneau de propriétés est maintenant plus interactif et permet une configuration de base des composants sélectionnés.
+    - D'autres types de champs (sélecteurs de couleur, sliders, etc.) et des propriétés plus complexes (liaison de données, gestion des actions) seront ajoutés ultérieurement.
+    - La réactivité entre le panneau de propriétés, le store et le canvas est fonctionnelle pour les propriétés éditées.
+
+**Milestone P2-L1-M6.4 (Impl): Documentation des Choix d'Implémentation Initiaux**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Création du document `docs/phase_2/implementation/P2_L1_M6_1_CANVAS_RENDERING_AND_STATE.md`.
+    - Ce document résume les choix techniques et la logique mise en œuvre pour les premières fonctionnalités du constructeur de dApp, notamment :
+        - Le fonctionnement du `componentRegistry` et de `RenderDndComponent` dans `CanvasArea.tsx` pour le rendu dynamique.
+        - L'initialisation des données de démonstration.
+        - L'utilisation du store Zustand (`builderStore.ts`) pour la gestion de l'état (`currentDApp`, `selectedComponentId`, etc.) et les actions associées.
+        - L'interaction entre le `PropertiesPanel.tsx` et le store pour l'édition des propriétés.
+    - Le document liste également les points d'amélioration et les prochaines étapes envisagées.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `docs/phase_2/implementation/P2_L1_M6_1_CANVAS_RENDERING_AND_STATE.md` (créé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Cette documentation vise à capitaliser sur les premières implémentations et à guider les développements futurs.
 
 *(Les entrées de log seront ajoutées ici au fur et à mesure de l'avancement)*
