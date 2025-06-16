@@ -402,4 +402,108 @@
 - Notes / Décisions:
     - Cette documentation fournit une référence technique pour l'implémentation actuelle du D&D et pour les itérations futures.
 
+**Milestone P2-L1-M6.5 (Impl): Intégration Drag & Drop de Base avec @dnd-kit**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Intégration de la librairie `@dnd-kit/core` pour les fonctionnalités de Drag & Drop.
+    - **`ComponentPalette.tsx`:**
+        - Les `DraggableComponentItem` utilisent maintenant `useDraggable` pour rendre les composants de la palette déplaçables.
+        - Les données associées au composant (type, nom, flag `isPaletteItem`) sont passées via `data` pour identification lors du drop.
+    - **`CanvasArea.tsx`:**
+        - Le composant principal `CanvasArea` est maintenant enveloppé dans un `<DndContext>` qui gère la logique de Drag & Drop.
+        - Un sous-composant `CanvasDropArea` a été créé et utilise `useDroppable` pour définir le canvas comme une zone de dépôt valide.
+        - Implémentation de la fonction `handleDragEnd` :
+            - Détecte si un item de la palette est déposé sur le `canvas-drop-area`.
+            - Si oui, un nouveau `DndComponent` est créé avec un ID unique, le type et nom du composant glissé, et des propriétés par défaut.
+            - Le nouveau composant est ajouté à la page active via l'action `addComponent` du `builderStore`.
+    - Le `builderStore.ts` n'a pas été modifié (la fonction `generateId` a été ajoutée localement à `CanvasArea.tsx` pour cet exemple).
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/editor-ui/ComponentPalette.tsx` (mis à jour)
+    - `src/modules/dapp-builder/editor-ui/CanvasArea.tsx` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Le glisser-déposer de nouveaux composants depuis la palette vers le canvas est maintenant fonctionnel.
+    - La prochaine étape pour le D&D sera de permettre le réagencement des composants déjà présents sur le canvas.
+    - La fonction `generateId` a été ajoutée localement à `CanvasArea.tsx` ; elle pourrait être centralisée ou remplacée par une bibliothèque UUID plus tard.
+
+**Milestone P2-L1-M6.6 (Impl): Réagencement des Composants sur le Canvas via Drag & Drop**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - **`builderStore.ts`:**
+        - Ajout d'une nouvelle action `reorderComponents(pageId, activeId, overId)` pour gérer la logique de réorganisation des composants au sein d'une page.
+        - L'implémentation actuelle gère le réagencement au niveau racine de la page, en déplaçant le composant `activeId` avant le composant `overId`, ou à la fin si `overId` est `null` (correspondant à un drop sur le fond du canvas).
+    - **`CanvasArea.tsx`:**
+        - Le composant `RenderDndComponent` est maintenant rendu "draggable" en utilisant `useDraggable` de `@dnd-kit/core`. L'ID draggable est l'ID du composant lui-même.
+        - Des styles visuels (opacité, curseur, transformation) sont appliqués pendant le glissement d'un `RenderDndComponent`.
+        - La fonction `handleDragEnd` a été étendue pour différencier les opérations :
+            - Ajout d'un nouveau composant (si l'élément glissé provient de la palette - `isPaletteItem`).
+            - Réagencement d'un composant existant (si l'élément glissé provient du canvas - `isCanvasItem`).
+            - Si réagencement, l'action `reorderComponents` du store est appelée avec les IDs appropriés.
+        - `CanvasDropArea` fournit un feedback visuel distinct si l'élément survolant est un item du canvas (pour réagencement) ou un item de la palette.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/state/builderStore.ts` (mis à jour)
+    - `src/modules/dapp-builder/editor-ui/CanvasArea.tsx` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Le réagencement de base des composants au premier niveau du canvas est fonctionnel.
+    - Le glisser-déposer pour imbriquer des composants (déposer un composant *dans* un `ContainerComponent`) ou pour réagencer des composants entre différents conteneurs n'est pas encore implémenté et nécessitera une logique de `Droppable` plus fine sur les conteneurs eux-mêmes.
+
+**Milestone P2-L1-M7.1 (Impl): Implémentation de la Sauvegarde/Export JSON de `DAppDefinition`**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Modification de `src/modules/dapp-builder/editor-ui/MainEditorLayout.tsx`.
+    - Ajout d'un bouton "Export JSON" dans la section `EditorHeader` du layout.
+    - Implémentation de la fonction `handleExportJson` :
+        - Récupère l'état `currentDApp` depuis `useBuilderStore`.
+        - Sérialise `currentDApp` en une chaîne JSON formatée (pretty-printed).
+        - Crée un objet `Blob` de type `application/json`.
+        - Utilise un élément `<a>` temporaire pour déclencher le téléchargement du fichier.
+        - Le nom du fichier est basé sur le nom de la dApp (ex: `Ma_dApp_config.json`).
+        - Le bouton est désactivé si aucune dApp n'est chargée.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/editor-ui/MainEditorLayout.tsx` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Les utilisateurs peuvent maintenant exporter la configuration de leur dApp en cours de construction.
+    - Cela permet une sauvegarde manuelle et le partage potentiel de configurations.
+    - La prochaine étape sera d'implémenter la fonctionnalité d'import.
+
+**Milestone P2-L1-M7.2 (Impl): Implémentation du Chargement/Import JSON de `DAppDefinition`**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Modification de `src/modules/dapp-builder/editor-ui/MainEditorLayout.tsx`.
+    - Ajout d'un bouton "Import JSON" dans la section `EditorHeader`.
+    - Utilisation d'un `<input type="file" accept=".json" />` caché, déclenché par le bouton.
+    - Implémentation de la fonction `handleFileChange` pour gérer la sélection du fichier :
+        - Utilise `FileReader` pour lire le contenu du fichier JSON.
+        - Parse le contenu en tant qu'objet `DAppDefinition`.
+        - Effectue une validation de base de la structure de l'objet importé (présence des champs `id`, `name`, `pages`).
+        - Appelle l'action `setCurrentDApp` du `builderStore` pour charger la configuration importée, remplaçant l'état actuel de la dApp.
+        - Inclut la gestion des erreurs pour la lecture et le parsing du fichier.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/editor-ui/MainEditorLayout.tsx` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Les utilisateurs peuvent maintenant importer une configuration de dApp depuis un fichier JSON.
+    - La validation de la structure du JSON importé est basique ; des schémas de validation plus robustes (ex: Zod) pourraient être ajoutés pour améliorer la fiabilité.
+
+**Milestone P2-L1-M7.4 (Impl): Documentation des Fonctionnalités d'Import/Export JSON**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Création du document `docs/phase_2/implementation/P2_L1_M7_3_IMPORT_EXPORT_JSON.md`.
+    - Ce document détaille le fonctionnement des mécanismes d'export et d'import de la configuration `DAppDefinition` au format JSON.
+    - Il décrit le processus d'export (sérialisation, création de Blob, téléchargement) et d'import (lecture de fichier, parsing, validation de base, mise à jour du store).
+    - Le format attendu du fichier JSON (basé sur l'interface `DAppDefinition`) est également précisé.
+    - Les considérations actuelles et les limitations (validation, gestion des conflits, taille, sécurité) sont mentionnées.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `docs/phase_2/implementation/P2_L1_M7_3_IMPORT_EXPORT_JSON.md` (créé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Cette documentation fournit une référence pour l'utilisation et la compréhension des fonctionnalités d'import/export, ainsi que pour leurs futures améliorations.
+
 *(Les entrées de log seront ajoutées ici au fur et à mesure de l'avancement)*
