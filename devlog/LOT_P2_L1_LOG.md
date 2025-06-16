@@ -320,7 +320,7 @@
     - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
 - Notes / Décisions:
     - Le panneau de propriétés est maintenant plus interactif et permet une configuration de base des composants sélectionnés.
-    - D'autres types de champs (sélecteurs de couleur, sliders, etc.) et des propriétés plus complexes (liaison de données, gestion des actions) seront ajoutés ultérieurement.
+    - D'autres types de champs (sélecteurs de couleur, sliders, etc.) et des propriétés plus complexes (liaison de données, gestion des actions) seront ajoutées ultérieurement.
     - La réactivité entre le panneau de propriétés, le store et le canvas est fonctionnelle pour les propriétés éditées.
 
 **Milestone P2-L1-M6.4 (Impl): Documentation des Choix d'Implémentation Initiaux**
@@ -506,4 +506,24 @@
 - Notes / Décisions:
     - Cette documentation fournit une référence pour l'utilisation et la compréhension des fonctionnalités d'import/export, ainsi que pour leurs futures améliorations.
 
+**Milestone P2-L1-M7.5 (Impl): Ajout du Bouton "Charger Exemple"**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Modification de `src/modules/dapp-builder/editor-ui/MainEditorLayout.tsx`.
+    - Ajout d'un bouton "Load Demo" dans la section `EditorHeader`.
+    - Implémentation de la fonction `handleLoadDemo` :
+        - Demande une confirmation à l'utilisateur si une dApp est déjà chargée, pour éviter un écrasement accidentel.
+        - Appelle la fonction `initializeDemoDApp` (importée depuis `builderStore.ts`) qui utilise `setCurrentDApp` pour charger les données de la dApp d'exemple dans le store.
+        - Affiche une alerte pour confirmer le chargement de la démo.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/editor-ui/MainEditorLayout.tsx` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Les utilisateurs peuvent maintenant facilement charger une configuration de dApp d'exemple.
+    - Cela est utile pour les tests, les démonstrations et pour que les nouveaux utilisateurs découvrent rapidement les capacités du builder.
+    - La dApp d'exemple elle-même (`initializeDemoDApp` dans le store) sera revue à la prochaine étape pour s'assurer qu'elle est pertinente.
+
 *(Les entrées de log seront ajoutées ici au fur et à mesure de l'avancement)*
+
+[end of devlog/LOT_P2_L1_LOG.md]

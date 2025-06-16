@@ -63,3 +63,29 @@ Ce document décrit les fonctionnalités d'import et d'export de la configuratio
 
 ---
 *Ce document décrit les fonctionnalités d'import/export JSON à l'issue des premières étapes de développement de P2-L1.*
+
+---
+
+## 4. Charger une dApp d'Exemple ("Load Demo")
+
+### 4.1. Fonctionnement
+- Un bouton "Load Demo" est disponible dans l'en-tête de l'éditeur (`MainEditorLayout.tsx`).
+- Au clic sur ce bouton :
+    1.  Si une dApp est actuellement chargée (`currentDApp` dans le store), une boîte de dialogue de confirmation (`window.confirm`) demande à l'utilisateur s'il souhaite remplacer la configuration actuelle. Si l'utilisateur annule, l'opération est stoppée.
+    2.  La fonction `initializeDemoDApp()` (exportée depuis `src/modules/dapp-builder/state/builderStore.ts`) est appelée.
+    3.  Cette fonction `initializeDemoDApp()` construit un objet `DAppDefinition` prédéfini et appelle `setCurrentDApp()` du `builderStore` pour charger ces données d'exemple.
+    4.  Une alerte (`alert()`) informe l'utilisateur que la dApp d'exemple a été chargée.
+
+### 4.2. Contenu de la dApp d'Exemple
+- La dApp d'exemple (`Demo dApp Showcase`) est définie dans la fonction `initializeDemoDApp()` dans `builderStore.ts`.
+- Elle contient une page unique ("Homepage") avec une sélection de composants de base :
+    - Un `HeadingComponent` avec des propriétés de style spécifiques.
+    - Un `TextComponent` descriptif.
+    - Un `ConnectWalletButtonComponent`.
+    - Un `ContainerComponent` avec des propriétés de style (couleur de fond, padding, etc.) et contenant lui-même des composants enfants (un autre `TextComponent` et un `DndComponentType.Button` générique).
+- L'objectif de cette démo est de présenter quelques composants de base, une structure imbriquée simple, et de fournir un point de départ pour les tests et l'exploration du builder.
+
+### 4.3. Utilité
+- **Test Rapide:** Permet de peupler rapidement le canvas avec une structure fonctionnelle pour tester le rendu, la sélection, et l'édition des propriétés.
+- **Démonstration:** Utile pour montrer les capacités de base du constructeur.
+- **Onboarding Utilisateur:** Peut servir de point de départ pour les nouveaux utilisateurs afin qu'ils découvrent comment une dApp simple est structurée.

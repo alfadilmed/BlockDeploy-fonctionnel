@@ -1,7 +1,8 @@
 // src/modules/dapp-builder/editor-ui/MainEditorLayout.tsx
-import React, { useRef } from 'react'; // Add useRef
-import useBuilderStore from '../state/builderStore';
-import { DAppDefinition } from '../types'; // Import DAppDefinition
+import React, { useRef } from 'react';
+// Ensure initializeDemoDApp is exported from your store and imported here
+import useBuilderStore, { initializeDemoDApp } from '../state/builderStore';
+import { DAppDefinition } from '../types';
 
 // Placeholder for sub-components - assuming they are defined elsewhere or will be
 // For this task, we only focus on adding the export button logic here or in a refined EditorHeader
@@ -13,12 +14,11 @@ const PropertiesPanel = () => <div style={{ border: '1px solid lightcoral', padd
 const EditorHeader: React.FC = () => {
   const { currentDApp, setCurrentDApp } = useBuilderStore(state => ({
     currentDApp: state.currentDApp,
-    setCurrentDApp: state.setCurrentDApp // Get setCurrentDApp action
+    setCurrentDApp: state.setCurrentDApp
   }));
-  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the file input
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleExportJson = () => {
-    // ... (existing export logic from previous step, ensure it uses currentDApp from store)
+  const handleExportJson = () => { /* ... existing code ... */
     if (!currentDApp) {
       alert('No dApp data to export.');
       return;
@@ -80,18 +80,35 @@ const EditorHeader: React.FC = () => {
     }
   };
 
+      const handleLoadDemo = () => {
+        // Optional: Confirm with the user if they want to overwrite the current dApp
+        if (currentDApp) {
+          if (!window.confirm('Loading a demo will replace your current dApp configuration. Are you sure?')) {
+            return;
+          }
+        }
+        initializeDemoDApp(); // This function should call setCurrentDApp internally
+        alert('Demo dApp loaded!');
+      };
+
   return (
     <div style={{ borderBottom: '1px solid #ccc', padding: '10px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <div>
         Editor Header (Project: {currentDApp?.name || 'Untitled dApp'})
       </div>
       <div>
+        <button
+          onClick={handleLoadDemo}
+          style={{padding: '5px 10px', marginLeft: '10px'}}
+        >
+          Load Demo
+        </button>
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
           accept=".json,application/json"
-          style={{ display: 'none' }} // Hidden file input
+          style={{ display: 'none' }}
         />
         <button
           onClick={handleImportClick}
@@ -111,7 +128,10 @@ const EditorHeader: React.FC = () => {
   );
 };
 
-// MainEditorLayout component remains the same as before
+// MainEditorLayout and other sub-components (ComponentPalette, CanvasArea, PropertiesPanel) remain the same.
+const ComponentPalette = () => <div style={{ border: '1px solid lightblue', padding: '10px', minWidth: '200px' }}>Component Palette Area</div>;
+const CanvasArea = () => <div style={{ border: '1px solid lightgreen', padding: '10px', flexGrow: 1 }}>Canvas Area</div>;
+const PropertiesPanel = () => <div style={{ border: '1px solid lightcoral', padding: '10px', minWidth: '250px' }}>Properties Panel Area</div>;
 
 const MainEditorLayout: React.FC = () => {
   return (

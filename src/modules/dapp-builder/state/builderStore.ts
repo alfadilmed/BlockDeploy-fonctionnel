@@ -124,17 +124,32 @@ const useBuilderStore = create<BuilderState & BuilderActions>((set, get) => ({
  * Function to create a unique ID.
  * Replace with a more robust UUID generator in a real app.
  */
+// Ensure generateId is available (it was defined in the previous store content)
 const generateId = () => `id_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 7)}`;
+
 
 export const initializeDemoDApp = () => {
   const demoPageId = generateId();
+  const headingId = generateId();
+  const textId = generateId();
+  const connectWalletId = generateId();
+  const containerId = generateId();
+  const nestedTextId = generateId();
+  const nestedButtonId = generateId();
+
   const demoDApp: DAppDefinition = {
     id: generateId(),
-    name: 'My Demo dApp',
+    name: 'Demo dApp Showcase', // Updated name
     globalSettings: {
       targetNetwork: 'sepolia',
     },
-    importedContracts: {},
+    importedContracts: {
+        // Example:
+        // "myToken": {
+        //   address: "0x123...",
+        //   abi: [ { "name": "balanceOf", "type": "function", ... } ]
+        // }
+    },
     pages: [
       {
         id: demoPageId,
@@ -142,28 +157,80 @@ export const initializeDemoDApp = () => {
         path: '/',
         components: [
           {
-            id: generateId(),
+            id: headingId,
             type: DndComponentType.Heading,
             name: 'Main Heading',
-            properties: { content: 'Welcome to My dApp!', fontSize: '24px', color: '#333', textAlign: 'center' } as any,
+            properties: {
+              content: 'Welcome to Your dApp!',
+              level: 1,
+              textAlign: 'center',
+              color: '#2c3e50',
+              fontSize: '32px'
+            },
           },
           {
-            id: generateId(),
+            id: textId,
             type: DndComponentType.Text,
             name: 'Intro Paragraph',
-            properties: { content: 'This is a dApp built with BlockDeploy\'s new dApp builder.', fontSize: '16px', color: '#555' } as any,
+            properties: {
+              content: 'This dApp was built visually using the BlockDeploy dApp Builder. You can drag, drop, and configure components to create your own Web3 frontend.',
+              fontSize: '16px',
+              color: '#34495e',
+              textAlign: 'left',
+            },
           },
           {
-            id: generateId(),
+            id: connectWalletId,
             type: DndComponentType.ConnectWalletButton,
-            name: 'Wallet Connect',
-            properties: { buttonText: 'Connect Your Wallet' }
+            name: 'Wallet Connect Button',
+            properties: {
+              buttonText: 'Connect Your Wallet Here'
+            }
+          },
+          {
+            id: containerId,
+            type: DndComponentType.Container,
+            name: 'Info Container',
+            properties: {
+              backgroundColor: '#ecf0f1',
+              padding: '20px',
+              margin: '20px 0',
+              border: '1px solid #bdc3c7',
+              flexDirection: 'column',
+              alignItems: 'stretch', // Changed from flex-start for full width children
+              gap: '10px'
+            },
+            children: [
+              {
+                id: nestedTextId,
+                type: DndComponentType.Text,
+                name: 'Container Text',
+                properties: {
+                  content: 'This text is inside a container. Containers help organize layout.',
+                  fontSize: '14px',
+                  color: '#7f8c8d'
+                }
+              },
+              {
+                id: nestedButtonId,
+                type: DndComponentType.Button, // Using the generic UI_BUTTON for this example
+                name: 'Learn More Button',
+                properties: {
+                  buttonText: 'Learn More (UI Button)',
+                  // Placeholder for action - real button component would have onClick, etc.
+                  style: { backgroundColor: '#3498db', color: 'white', padding: '10px 15px', border: 'none', borderRadius: '5px' }
+                }
+              }
+            ]
           }
         ],
       },
     ],
   };
+  // Get the store's setter function to update the state
   useBuilderStore.getState().setCurrentDApp(demoDApp);
 };
 
 export default useBuilderStore;
+
+// ... (rest of the store code)
