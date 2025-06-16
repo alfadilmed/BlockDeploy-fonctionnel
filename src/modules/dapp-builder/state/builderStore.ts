@@ -10,7 +10,8 @@ interface BuilderActions {
   addComponent: (pageId: string, component: DndComponent, parentId?: string) => void;
   updateComponentProperties: (componentId: string, properties: Partial<Record<string, any>>) => void;
   setSelectedComponent: (componentId: string | null) => void;
-  // TODO: Add actions for removing components, reordering, managing pages, etc.
+  // New action for reordering
+  reorderComponents: (pageId: string, activeId: string, overId: string | null) => void;
 }
 
 // Create the store with an initial state and actions
@@ -81,6 +82,39 @@ const useBuilderStore = create<BuilderState & BuilderActions>((set, get) => ({
 
   setSelectedComponent: (componentId) => set({ selectedComponentId: componentId }),
 
+  reorderComponents: (pageId, activeId, overId) => {
+    const currentDApp = get().currentDApp;
+    if (!currentDApp) return;
+
+    const pageIndex = currentDApp.pages.findIndex(p => p.id === pageId);
+    if (pageIndex === -1) return;
+
+    const page = currentDApp.pages[pageIndex];
+    let components = [...page.components]; // Work on a copy
+
+    const activeIndex = components.findIndex(c => c.id === activeId);
+    let overIndex = overId ? components.findIndex(c => c.id === overId) : -1;
+
+    if (activeIndex === -1) return; // Active component not found
+
+    const [movedItem] = components.splice(activeIndex, 1);
+
+    if (overId === null || overIndex === -1) { // Dropped on canvas background or invalid overId
+        components.push(movedItem); // Move to the end
+    } else {
+        // Adjust overIndex if item is moved from before to after its original position
+        // This basic logic might need refinement for complex cases or if overIndex is the item itself
+        if (activeIndex < overIndex) {
+            // No adjustment needed if moving down and overIndex is correctly identified as the target's index
+        }
+        components.splice(overIndex, 0, movedItem);
+    }
+
+    const updatedPages = [...currentDApp.pages];
+    updatedPages[pageIndex] = { ...page, components };
+
+    set({ currentDApp: { ...currentDApp, pages: updatedPages } });
+  },
 }));
 
 // --- Example Usage (for testing or demonstration) ---
