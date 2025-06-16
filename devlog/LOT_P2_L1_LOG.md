@@ -143,4 +143,107 @@
     - Cette milestone marque la fin de la phase de conception et de planification détaillée pour P2-L1.
     - La prochaine étape consistera à remplir les sections générales du document de planification P2-L1 avant de le soumettre.
 
+---
+## Implémentation Technique P2-L1 (Alpha)
+
+**Milestone P2-L1-M5.1: Création de la Structure de Dossiers de Base**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Simulation de la création de la structure de dossiers pour le nouveau module `dapp-builder` au sein de `src/modules/`.
+    - Création de fichiers `README.md` placeholders dans les sous-répertoires suivants pour marquer leur existence et leur rôle :
+        - `src/modules/dapp-builder/` (racine du module)
+        - `src/modules/dapp-builder/core/` (logique principale du builder)
+        - `src/modules/dapp-builder/components/` (composants Drag & Drop)
+        - `src/modules/dapp-builder/editor-ui/` (interface de l'éditeur)
+        - `src/modules/dapp-builder/state/` (gestion de l'état)
+        - `src/modules/dapp-builder/types/` (définitions TypeScript)
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/README.md` (créé)
+    - `src/modules/dapp-builder/core/README.md` (créé)
+    - `src/modules/dapp-builder/components/README.md` (créé)
+    - `src/modules/dapp-builder/editor-ui/README.md` (créé)
+    - `src/modules/dapp-builder/state/README.md` (créé)
+    - `src/modules/dapp-builder/types/README.md` (créé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Cette structure est conforme à la planification P2-L1-M5.
+    - La prochaine étape consistera à définir les interfaces TypeScript de base pour le module.
+
+**Milestone P2-L1-M5.2: Définition des Interfaces TypeScript de Base**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Création du fichier `src/modules/dapp-builder/types/index.ts`.
+    - Définition des interfaces et types initiaux nécessaires pour la structure du constructeur de dApp:
+        - `DndComponentType` (enum pour les types de composants)
+        - `DndComponent` (structure d'un composant sur le canvas)
+        - `DAppPage` (structure d'une page de la dApp)
+        - `DAppDefinition` (définition globale d'un projet de dApp)
+        - `BuilderState` (pour l'état du store Zustand)
+        - Exemples d'interfaces de propriétés spécifiques pour des composants (`TextComponentProps`, `ContractInteractionButtonProps`).
+    - Suppression du fichier `README.md` du répertoire `types` car remplacé par `index.ts`.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/types/index.ts` (créé)
+    - `src/modules/dapp-builder/types/README.md` (supprimé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Ces interfaces fournissent une première structure de données pour le développement du builder.
+    - Elles seront étendues et affinées au fur et à mesure du développement des fonctionnalités.
+
+**Milestone P2-L1-M5.3: Initialisation du Store d'État (Zustand)**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Création du fichier `src/modules/dapp-builder/state/builderStore.ts`.
+    - Mise en place d'un store Zustand de base (`useBuilderStore`) pour gérer l'état du constructeur de dApp.
+    - Le store inclut des états initiaux pour `currentDApp`, `activePageId`, `selectedComponentId`, `isSaving`.
+    - Définition des actions initiales : `setCurrentDApp`, `setActivePage`, `addComponent`, `updateComponentProperties`, `setSelectedComponent`.
+    - Ajout d'une fonction d'exemple `initializeDemoDApp` pour faciliter les tests et la démonstration.
+    - Suppression du fichier `README.md` du répertoire `state` car remplacé par `builderStore.ts`.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/state/builderStore.ts` (créé)
+    - `src/modules/dapp-builder/state/README.md` (supprimé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Ce store servira de source de vérité unique pour l'état de l'interface de l'éditeur et de la dApp en cours de construction.
+    - Des actions plus spécifiques (suppression, réorganisation de composants, gestion des pages) seront ajoutées ultérieurement.
+
+**Milestone P2-L1-M5.4: Création des Composants "Placeholder" pour l'UI du Builder**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé
+- Description des Actions:
+    - Création des fichiers squelettes pour les principaux composants React de l'interface de l'éditeur du dApp Builder dans `src/modules/dapp-builder/editor-ui/`.
+    - `MainEditorLayout.tsx`: Définit la structure globale avec des placeholders pour l'en-tête, la palette, le canvas et le panneau de propriétés.
+    - `ComponentPalette.tsx`: Placeholder pour afficher la liste des composants "Drag & Drop" disponibles.
+    - `CanvasArea.tsx`: Placeholder pour la zone de construction principale où les composants seront déposés et rendus. Inclut une fonction de rendu récursive basique (`RenderDndComponent`) et une interaction simple avec le store pour la sélection.
+    - `PropertiesPanel.tsx`: Placeholder pour afficher et éditer les propriétés du composant sélectionné, avec une interaction de base avec le store.
+    - Suppression du fichier `README.md` du répertoire `editor-ui` car remplacé par les fichiers de composants.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `src/modules/dapp-builder/editor-ui/MainEditorLayout.tsx` (créé)
+    - `src/modules/dapp-builder/editor-ui/ComponentPalette.tsx` (créé)
+    - `src/modules/dapp-builder/editor-ui/CanvasArea.tsx` (créé)
+    - `src/modules/dapp-builder/editor-ui/PropertiesPanel.tsx` (créé)
+    - `src/modules/dapp-builder/editor-ui/README.md` (supprimé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Ces composants sont des placeholders fonctionnels très basiques.
+    - L'intégration de la logique de Drag & Drop (@dnd-kit) et le rendu dynamique basé sur les types de composants réels seront les prochaines étapes d'implémentation.
+    - Le style est minimaliste (via `style` inline) et sera remplacé par des classes Tailwind CSS ou des composants stylés du design system.
+
+**Milestone P2-L1-M5.5: Description de la Mise en Place du Routing de Base**
+- Date: $(date --iso-8601=seconds)
+- Avancement: Terminé (Conceptuellement)
+- Description des Actions:
+    - Création du document `docs/phase_2/implementation/P2_L1_M5_5_DAPP_BUILDER_ROUTING_SETUP.md`.
+    - Ce document décrit les modifications conceptuelles à apporter au système de routing de l'application (supposant `react-router-dom`) pour rendre le constructeur de dApp accessible.
+    - Inclut des exemples d'ajout de routes (ex: `/dapp-builder/:projectId`) pointant vers le composant `MainEditorLayout`.
+    - Mentionne des considérations pour le lazy loading et la protection des routes.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `docs/phase_2/implementation/P2_L1_M5_5_DAPP_BUILDER_ROUTING_SETUP.md` (créé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - L'implémentation effective du routing se fera lors de l'intégration du module dans l'application principale.
+    - Le choix de la structure exacte de la route (ex: avec ou sans `projectId` pour le MVP) sera finalisé à ce moment-là.
+
 *(Les entrées de log seront ajoutées ici au fur et à mesure de l'avancement)*
