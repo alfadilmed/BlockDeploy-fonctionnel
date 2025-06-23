@@ -95,3 +95,24 @@ Ce lot se concentre sur la **planification et la conception détaillée** des fo
 -   **Safe{Core} SDK:** Pour l'interaction avec les coffres-forts Gnosis Safe.
 
 Ce plan servira de feuille de route pour la phase de conception du Lot P2-L4. Il sera détaillé et ajusté au fur et à mesure de l'avancement de chaque milestone.
+
+## 6. Axes Stratégiques et Conclusions de la Recherche M1
+
+La Milestone M1 (Recherche Approfondie et Définition des Architectures Cibles) a permis de dégager les orientations stratégiques suivantes pour le BlockDeploy DAO Builder :
+
+-   **Architecture Technique Recommandée:**
+    -   **Approche Hybride Modulaire:** L'architecture s'appuiera sur **Gnosis Safe (via Safe{Core} SDK)** comme couche de base sécurisée pour la gestion de la trésorerie et l'exécution des actions de la DAO.
+    -   La **gouvernance sera assurée par des modules** qui contrôlent le Gnosis Safe. Ces modules s'inspireront fortement de l'écosystème **Zodiac** (pour la modularité et l'extensibilité) et des contrats **OpenZeppelin Governor** (pour les mécanismes de vote on-chain robustes et standardisés).
+    -   Cette approche permet de combiner la sécurité éprouvée de Gnosis Safe avec la flexibilité des systèmes de gouvernance modernes.
+
+-   **Choix Stratégiques Clés:**
+    -   **Focus Mono-Framework Initial:** Pour la première version du DAO Builder Avancé, il est recommandé de se concentrer sur l'écosystème **Gnosis Safe + Modules de type Zodiac/OpenZeppelin Governor**. Cela permet de capitaliser sur l'intégration Safe{Core} existante, de réduire la complexité initiale et d'offrir une expérience utilisateur cohérente. Le support pour d'autres frameworks (Aragon, Moloch) pourra être envisagé dans des itérations futures en fonction de la demande.
+    -   **Support Dual Vote (On-Chain & Off-Chain):** Il est crucial de supporter à la fois :
+        -   Le **vote on-chain** (via des contrats type Governor) pour les décisions critiques nécessitant une exécution directe et trustless.
+        -   Le **vote off-chain** (type Snapshot, avec signatures) pour améliorer la participation en réduisant les coûts de gas, couplé à un mécanisme d'exécution on-chain sécurisé (ex: module Zodiac Reality/Oracle ou exécuteur désigné par la gouvernance).
+    -   **Intégration au Dashboard BlockDeploy:** Le DAO Builder doit s'intégrer de manière fluide au dashboard existant, en l'enrichissant avec les nouvelles fonctionnalités de gouvernance avancée, tout en maintenant une expérience utilisateur unifiée pour la gestion de la trésorerie (Safe) et de la gouvernance.
+
+-   **Cas d'Usage Prioritaires:**
+    -   Bien que plusieurs cas d'usage aient été identifiés, les premiers efforts de conception et d'implémentation pourraient se concentrer sur les DAOs de **gestion de trésorerie communautaire** et les **DAOs de gouvernance de protocole DeFi**, car ils représentent des besoins courants et permettent de valider les aspects clés de la trésorerie (Safe) et de la gouvernance par token (Governor/Snapshot).
+
+Ces orientations issues de la M1 guideront la conception détaillée des modèles de données, des contrats, de l'UX/UI et de l'API backend dans les milestones suivantes (M2-M5) de ce lot de planification.
