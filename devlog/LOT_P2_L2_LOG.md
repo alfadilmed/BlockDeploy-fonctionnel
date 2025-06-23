@@ -28,3 +28,24 @@ Ce journal documente les activités, décisions, et progrès concernant le déve
     - Description de leurs besoins, frustrations et comment l'IA peut les aider.
 - **Décision:** Ces documents serviront de base pour la conception détaillée de l'interface utilisateur et des interactions avec l'assistant IA.
 - **Prochaine Étape:** Raffiner les wireframes et commencer à esquisser des maquettes conceptuelles pour l'interface de l'assistant.
+
+## [2024-07-29] - Démarrage Milestone M2: Développement du Backend de l’Assistant IA
+
+- **Activité:** Création du document de conception backend `docs/phase_2/backend/P2_L2_M2_AI_BACKEND_DESIGN.md`.
+    - Définition des objectifs du backend.
+    - Proposition d'une architecture générale.
+    - Spécification des endpoints API REST (ex: `/api/v1/ai-assistant/query`).
+    - Définition des schémas de données (DTOs) pour les requêtes et réponses (AIQueryRequestDTO, AIQueryResponseDTO, ErrorDTO).
+    - Ébauche d'une structure de service pour une application Python/FastAPI.
+    - Description de l'intégration avec les LLMs (OpenAI/Gemini), incluant la gestion des prompts et la sécurité.
+    - Proposition d'une stratégie de tests unitaires et de mocks.
+- **Décision:** Le document `P2_L2_M2_AI_BACKEND_DESIGN.md` servira de fil conducteur pour l'implémentation du service backend.
+- **Prochaines Étapes (court terme):**
+    - Commencer l'implémentation initiale de l'API backend (M2 - Phase d'implémentation).
+    - Mettre en place la structure de base du projet FastAPI.
+    - Implémenter le endpoint `/query` avec une intégration LLM mockée dans un premier temps.
+- **Prochaines Étapes (lots suivants):**
+    - **M3:** Développement Frontend de l'Assistant IA et intégration avec ce backend.
+    - **M4:** Entraînement et Affinage des Prompts IA (avec potentiellement RAG).
+    - **M5:** Tests et Itérations (Alpha/Beta utilisateurs).
+    - **M6:** Déploiement et Documentation Finale.
