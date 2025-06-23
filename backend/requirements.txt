@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+
+# For tests
+pytest
+pytest-cov
+httpx # For testing FastAPI async client
+pytest-mock
