@@ -49,3 +49,22 @@ Ce journal documente les activités, décisions, et progrès concernant le déve
     - **M4:** Entraînement et Affinage des Prompts IA (avec potentiellement RAG).
     - **M5:** Tests et Itérations (Alpha/Beta utilisateurs).
     - **M6:** Déploiement et Documentation Finale.
+
+## [2024-07-30] - Démarrage Milestone M3: Prompt Engineering & Sécurité
+
+- **Activité:** Création du document de conception des prompts et sécurité `docs/phase_2/ai/P2_L2_M3_PROMPT_DESIGN_AND_SECURITY.md`.
+    - Définition des objectifs du prompt engineering pour BlockDeploy.
+    - Proposition d'une structure type pour les prompts (System Prompt, User Query Template).
+    - Identification des variables dynamiques clés à injecter dans les prompts.
+    - Énumération des techniques de protection contre le prompt injection (délimiteurs, sanitization, etc.).
+    - Description des stratégies pour la journalisation, les limites de requêtes (rate limiting), et la gestion des erreurs.
+    - Mention de l'importance de l'itération et de l'amélioration continue des prompts.
+- **Décision:** Ce document (`P2_L2_M3_PROMPT_DESIGN_AND_SECURITY.md`) servira de référence pour la construction et la sécurisation des interactions avec le LLM. Il sera crucial pour les développements backend (M2) et l'affinage de l'IA (M4).
+- **Prochaines Étapes (court terme):**
+    - Intégrer les principes de construction de prompt et de sécurité dans l'implémentation du `PromptManager` et du `LLMService` du backend (M2).
+    - Commencer à définir des system prompts spécifiques pour les premiers cas d'usage.
+- **Prochaines Étapes (lots suivants):**
+    - **M2 (suite):** Finalisation de l'implémentation backend initiale intégrant ces concepts de prompt.
+    - **M4:** Développement de la stratégie RAG et affinage avancé des prompts basé sur la documentation BlockDeploy.
+    - **M5:** Tests utilisateurs pour valider l'efficacité et la sécurité des prompts.
+    - **M6:** Déploiement et Documentation Finale.
