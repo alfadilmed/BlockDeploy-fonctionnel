@@ -65,3 +65,21 @@ Ce journal documente les activités, décisions, et progrès concernant l'implé
 - **Activité:** Documentation des actions et décisions dans `docs/phase_2/implementation/P2_L3_M2_RAG_AND_KB_SETUP.md`.
 - **Statut M2:** **Terminée.** Le pipeline RAG de base est fonctionnel et testé. L'assistant peut théoriquement utiliser la documentation BlockDeploy pour contextualiser ses réponses.
 - **Prochaine Étape (M3):** Développement du Frontend Initial (Panneau de Chat).
+
+## [2024-08-06] - Milestone M3 (Lot P2-L3): Développement Frontend Initial (Panneau de Chat)
+
+- **Activité:** Création du document de suivi `docs/phase_2/implementation/P2_L3_M3_CHAT_FRONTEND.md`.
+- **Activité:** Mise en place de la structure de base pour les composants frontend de l'assistant IA (React/TypeScript) dans `frontend/src/features/aiAssistant/`.
+    - Création des placeholders pour les composants `AssistantChatPanel.tsx`, `MessageList.tsx`, `MessageInput.tsx`.
+    - Création du service `aiAssistantService.ts` pour les appels API.
+    - Création du hook `useChatState.ts` pour la gestion de l'état du chat et la persistance `localStorage`.
+    - Création d'un placeholder pour un store Zustand (`store/chatStore.ts`), bien que `useChatState` soit utilisé pour M3.
+- **Activité:** Développement du composant `AssistantChatPanel.tsx` avec UI de base (panneau flottant/dockable, en-tête, zones de messages et de saisie).
+- **Activité:** Développement du composant `MessageList.tsx` pour afficher les messages (utilisateur, assistant, système) avec des styles distincts.
+- **Activité:** Développement du composant `MessageInput.tsx` pour la saisie de texte et le bouton d'envoi, gérant l'état de chargement.
+- **Activité:** Connexion du `AssistantChatPanel` au service API via `useChatState` pour envoyer des messages et recevoir des réponses (du MockLLM backend).
+- **Activité:** Gestion visuelle des états UI (chargement, erreurs, état initial, affichage des réponses texte).
+- **Activité:** Écriture de tests unitaires initiaux pour les composants React (`MessageList`, `MessageInput`, `AssistantChatPanel`), le hook `useChatState`, et le service `aiAssistantService`.
+- **Activité:** Documentation des actions, choix d'implémentation et structure dans `docs/phase_2/implementation/P2_L3_M3_CHAT_FRONTEND.md`.
+- **Statut M3:** **Terminée.** Une première version fonctionnelle de l'interface du panneau de chat est en place et testée unitairement.
+- **Prochaine Étape (M4):** Itération sur les Fonctionnalités Clés et Intégration Avancée (connexion LLM réel, affinage RAG, fonctionnalités spécifiques).
