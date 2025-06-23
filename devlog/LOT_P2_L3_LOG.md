@@ -42,3 +42,26 @@ Ce journal documente les activités, décisions, et progrès concernant l'implé
     - Documente les actions réalisées, les choix techniques et les conclusions pour M1.
 - **Statut M1:** **Terminée.** Les fondations backend sont posées.
 - **Prochaine Étape (M2):** Implémentation Initiale de la RAG et Base de Connaissances.
+
+## [2024-08-05] - Milestone M2 (Lot P2-L3): Implémentation Initiale de la RAG et Base de Connaissances
+
+- **Activité:** Création du document de suivi `docs/phase_2/implementation/P2_L3_M2_RAG_AND_KB_SETUP.md`.
+- **Activité:** Ajout des dépendances `sentence-transformers`, `faiss-cpu`, `PyPDF2`, `unstructured`, `markdown` à `backend/requirements.txt`.
+- **Activité:** Développement du module `RAGProcessor` (`backend/app/services/rag_processor.py`).
+    - Chargement et prétraitement des documents Markdown (avec fallback si `unstructured` est absent).
+    - Génération d'embeddings avec `all-MiniLM-L6-v2`.
+    - Création, sauvegarde et chargement d'index FAISS local (`backend/app/data/`).
+    - Fonction de recherche de similarité.
+- **Activité:** Création du script d'indexation `backend/scripts/index_documentation.py` pour traiter le répertoire `/docs` et construire l'index FAISS.
+- **Activité:** Modification du `PromptManager` pour intégrer le `RAGProcessor`.
+    - Récupération de contexte pertinent basé sur la requête utilisateur.
+    - Injection du contexte RAG dans le template de prompt système.
+- **Activité:** Mise à jour du endpoint `/query` pour initialiser et utiliser le `RAGProcessor` via une dépendance FastAPI, et le passer au `PromptManager`.
+- **Activité:** Adaptation du `MockLLMService` pour logger/afficher le contexte RAG reçu et l'inclure partiellement dans sa réponse simulée pour vérification.
+- **Activité:** Écriture de tests unitaires et d'intégration :
+    - `test_rag_processor.py`: Valide les fonctionnalités du `RAGProcessor`.
+    - `test_prompt_manager_with_rag.py`: Valide l'intégration RAG dans `PromptManager` avec un RAGProcessor mocké.
+    - `test_query_endpoint_with_rag.py`: Teste le endpoint `/query` avec un `RAGProcessor` réel (utilisant un index de test) et un `LLMService` mocké.
+- **Activité:** Documentation des actions et décisions dans `docs/phase_2/implementation/P2_L3_M2_RAG_AND_KB_SETUP.md`.
+- **Statut M2:** **Terminée.** Le pipeline RAG de base est fonctionnel et testé. L'assistant peut théoriquement utiliser la documentation BlockDeploy pour contextualiser ses réponses.
+- **Prochaine Étape (M3):** Développement du Frontend Initial (Panneau de Chat).

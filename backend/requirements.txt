@@ -8,3 +8,10 @@ pytest
 pytest-cov
 httpx # For testing FastAPI async client
 pytest-mock
+
+# For RAG (M2)
+sentence-transformers
+faiss-cpu # For CPU version of FAISS. Use faiss-gpu for GPU version.
+PyPDF2 # If we need to process PDF documents for RAG
+Unstructured # For processing various document types, including Markdown
+markdown # To parse markdown if Unstructured needs it or for direct parsing

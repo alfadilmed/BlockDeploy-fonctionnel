@@ -3,17 +3,50 @@ from typing import Annotated
 import uuid
 from datetime import datetime
 
-from ..schemas import AIQueryRequestDTO, AIQueryResponseDTO, ErrorDTO, AIResponseData, SourceData # Added SourceData
+from ..schemas import AIQueryRequestDTO, AIQueryResponseDTO, ErrorDTO, AIResponseData, SourceData
 from ....services.llm_service import BaseLLMService, get_llm_service, LLMServiceError
 from ....services.prompt_manager import PromptManager
+from ....services.rag_processor import RAGProcessor # Import RAGProcessor
 from ....core.config import settings
 
 
 router = APIRouter()
 
-# Dependency for PromptManager (can be customized if PromptManager needs config)
-def get_prompt_manager():
-    return PromptManager()
+# --- Dependencies ---
+
+# Global RAGProcessor instance (loaded once at startup, or on first request)
+# For simplicity in M2, we load it here. In a larger app, this might be managed
+# by FastAPI startup events or a more sophisticated dependency injection system.
+# This instance will load the default FAISS index if it exists.
+# If the index needs to be built, the `scripts/index_documentation.py` must be run first.
+_rag_processor_instance: Optional[RAGProcessor] = None
+
+def get_rag_processor_instance() -> Optional[RAGProcessor]:
+    """
+    Returns a singleton RAGProcessor instance.
+    Initializes it on first call if the FAISS index exists.
+    """
+    global _rag_processor_instance
+    if _rag_processor_instance is None:
+        try:
+            # RAGProcessor now tries to load index on init.
+            # If index files don't exist, it will print a message but won't fail init.
+            # Search will return empty if index is not loaded.
+            _rag_processor_instance = RAGProcessor()
+            if _rag_processor_instance.index is None:
+                 print("Warning: RAGProcessor initialized, but FAISS index is not loaded. RAG context will be unavailable. Run indexing script.")
+            else:
+                 print("RAGProcessor initialized and FAISS index loaded successfully.")
+        except Exception as e:
+            print(f"Error initializing RAGProcessor: {e}. RAG context will be unavailable.")
+            # Keep _rag_processor_instance as None so PromptManager gets None
+    return _rag_processor_instance
+
+# Dependency for PromptManager, now with RAGProcessor
+def get_prompt_manager(rag_processor: Optional[RAGProcessor] = Depends(get_rag_processor_instance)):
+    return PromptManager(rag_processor=rag_processor)
+
+# --- Endpoint ---
 
 @router.post(
     "/query",
