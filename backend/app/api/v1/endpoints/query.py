@@ -6,8 +6,10 @@ from datetime import datetime
 from ..schemas import AIQueryRequestDTO, AIQueryResponseDTO, ErrorDTO, AIResponseData, SourceData
 from ....services.llm_service import BaseLLMService, get_llm_service, LLMServiceError
 from ....services.prompt_manager import PromptManager
-from ....services.rag_processor import RAGProcessor # Import RAGProcessor
+from ....services.rag_processor import RAGProcessor
 from ....core.config import settings
+from ....main import limiter # Import the limiter instance from main.py
+from fastapi import Request # Import Request for the limiter
 
 
 router = APIRouter()
@@ -54,15 +56,19 @@ def get_prompt_manager(rag_processor: Optional[RAGProcessor] = Depends(get_rag_p
     responses={
         422: {"model": ErrorDTO, "description": "Validation Error"},
         500: {"model": ErrorDTO, "description": "Internal Server Error"},
-        503: {"model": ErrorDTO, "description": "LLM Service Unavailable"}
+        503: {"model": ErrorDTO, "description": "LLM Service Unavailable"},
+        429: {"model": ErrorDTO, "description": "Rate Limit Exceeded"} # Added for rate limit
     },
     summary="Submit a query to the AI Assistant",
     description="Receives a user query and context, processes it through an LLM, and returns a structured AI response."
 )
+@limiter.limit(settings.DEFAULT_RATE_LIMIT) # Apply rate limiting using the default from settings
 async def query_ai_assistant(
     request_dto: AIQueryRequestDTO = Body(...),
-    llm_service: BaseLLMService = Depends(get_llm_service), # Injects the configured LLM service
-    prompt_manager: PromptManager = Depends(get_prompt_manager) # Injects PromptManager
+    request: Request = None, # request object is automatically passed by FastAPI if type hinted
+                             # and is used by the limiter (specifically key_func)
+    llm_service: BaseLLMService = Depends(get_llm_service),
+    prompt_manager: PromptManager = Depends(get_prompt_manager)
 ):
     """
     Endpoint to interact with the AI Assistant.

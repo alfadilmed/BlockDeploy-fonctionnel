@@ -107,3 +107,24 @@ Ce journal documente les activités, décisions, et progrès concernant l'implé
 - **Activité:** Documentation des actions, choix et conclusions dans `docs/phase_2/implementation/P2_L3_M4_CONTEXTUAL_ASSISTANT.md`.
 - **Statut M4:** **Terminée.** L'assistant est plus intelligent, avec des feedbacks améliorés et une première version de l'aide contextuelle.
 - **Prochaine Étape (M5):** Tests Complets, Sécurité et Optimisation (incluant le passage à un LLM réel).
+
+## [2024-08-08] - Milestone M5 (Lot P2-L3): Tests Complets, Sécurité et Optimisation
+
+- **Activité:** Création du document de suivi `docs/phase_2/implementation/P2_L3_M5_TESTS_AND_SECURITY.md`.
+- **Activité:** Exécution (simulée) des tests manuels et exploratoires basés sur `P2_L2_M5_AI_ASSISTANT_TEST_PLAN.md`. Identification de cas non couverts pour le futur.
+- **Activité:** Tests et Protections contre le Prompt Injection (Backend) :
+    - Renforcement du system prompt dans `PromptManager` avec des instructions de sécurité plus robustes.
+    - Création de tests unitaires (`test_prompt_manager_security.py`) pour vérifier la construction des prompts sécurisés.
+- **Activité:** Optimisations des Performances du Backend :
+    - Ajout de `slowapi` et configuration du rate limiting (10 req/min/IP par défaut) sur le endpoint `/query`.
+    - Analyse de la pertinence du cache d'embeddings de requêtes (reporté pour M5).
+- **Activité:** Tests de Performance et Cas Limites Supplémentaires :
+    - Ajout de tests unitaires dans `test_rag_processor.py` pour les erreurs de chargement/corruption d'index RAG.
+    - Ajout d'un test d'intégration de performance basique pour le flux RAG dans `test_query_endpoint_with_rag.py`.
+- **Activité:** Implémentation d'une Métrique de Satisfaction Utilisateur (Frontend) :
+    - Ajout d'icônes 👍/👎 dans `MessageList.tsx`.
+    - Logique dans `useChatState.ts` pour enregistrer le feedback (console.log et localStorage pour M5).
+    - Tests unitaires pour la fonctionnalité de feedback.
+- **Activité:** Documentation des tests effectués, mesures de sécurité, optimisations et conclusions dans `docs/phase_2/implementation/P2_L3_M5_TESTS_AND_SECURITY.md`.
+- **Statut M5:** **Terminée.** L'assistant a été testé plus en profondeur, des mesures de sécurité initiales et des optimisations ont été appliquées. Une fonctionnalité de feedback utilisateur a été ajoutée.
+- **Prochaine Étape (M6):** Préparation au Déploiement et Documentation Utilisateur (et connexion à un LLM réel).

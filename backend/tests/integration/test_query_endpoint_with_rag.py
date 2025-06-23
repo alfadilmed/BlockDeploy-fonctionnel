@@ -183,6 +183,55 @@ def test_query_endpoint_with_rag_no_relevant_docs(
     assert "No relevant documents found in the knowledge base for this query." in final_prompt_to_llm
 
 
+def test_query_endpoint_rag_performance_basic(
+    client_with_rag_paths: TestClient, monkeypatch
+):
+    # This is a very basic performance check, not a rigorous benchmark.
+    # It measures the time for one request involving RAG.
+    # Mock LLMService to have minimal, predictable delay.
+    mock_llm_instance = AsyncMock()
+    async def fast_mock_llm_call(prompt, llm_options):
+        await asyncio.sleep(0.01) # Minimal sleep for the mock LLM
+        # Ensure the mock response matches what AIResponseData expects,
+        # or what MockLLMService would return.
+        return {
+            "text_response": "Performance test RAG response.",
+            "model_used": "perf-test-model",
+            "structured_data": {}, # Ensure all fields expected by AIResponseData
+            "confidence_score": 0.9, # are present or correctly optional in DTO
+            "sources": [],
+            "usage": {"prompt_tokens":10, "completion_tokens":5, "total_tokens":15}
+        }
+    mock_llm_instance.generate_response = AsyncMock(side_effect=fast_mock_llm_call)
+    monkeypatch.setattr("app.api.v1.endpoints.query.get_llm_service", lambda: mock_llm_instance)
+
+    request_payload = {
+        "user_id": "perf_test_user",
+        "query_text": "FastAPI testing information", # Should hit the RAG index
+    }
+
+    start_time = time.perf_counter()
+    response = client_with_rag_paths.post("/api/v1/ai-assistant/query", json=request_payload)
+    end_time = time.perf_counter()
+
+    duration_ms = (end_time - start_time) * 1000
+    print(f"RAG Query Endpoint Response Time (incl. RAG search + 0.01s mock LLM): {duration_ms:.2f} ms")
+
+    assert response.status_code == 200
+    # A reasonable expectation for RAG + embedding query + FastAPI overhead, excluding actual LLM.
+    # This threshold is arbitrary and depends heavily on the machine, embedding model, index size.
+    # For a small index and MiniLM, it should be well under a second.
+    # Let's set a loose upper bound for now, e.g., 500-1000ms.
+    # This is more of a smoke test for "is it reasonably fast" than a benchmark.
+    # Increased to 1500ms to be safer on various CI/test environments
+    assert duration_ms < 1500
+
+    json_response = response.json()
+    assert "Performance test RAG response" in json_response["assistant_response"]["text_response"]
+
+
+import asyncio # Added missing import at the top of the file
+
 # This fixture is needed by pytest if tmp_path_factory is used with session scope
 @pytest.fixture(scope="session")
 def tmp_path_factory_session(tmp_path_factory):

@@ -57,6 +57,75 @@ describe('MessageList', () => {
     expect(userMessage).toHaveClass('message-sender-user');
     expect(systemMessage).toHaveClass('message-sender-system');
   });
+
+  it('renders feedback buttons for assistant messages if onMessageFeedback is provided', () => {
+    const mockOnFeedback = jest.fn();
+    const messagesWithAssistant: Message[] = [
+      { id: 'a1', text: 'AI response', sender: 'assistant', timestamp: new Date() }
+    ];
+    render(<MessageList messages={messagesWithAssistant} onMessageFeedback={mockOnFeedback} />);
+
+    expect(screen.getByTitle('Good response')).toBeInTheDocument();
+    expect(screen.getByTitle('Bad response')).toBeInTheDocument();
+  });
+
+  it('does not render feedback buttons for user or system messages', () => {
+    const mockOnFeedback = jest.fn();
+    const messagesNonUser: Message[] = [
+      { id: 'u1', text: 'User question', sender: 'user', timestamp: new Date() },
+      { id: 's1', text: 'System info', sender: 'system', timestamp: new Date() }
+    ];
+    render(<MessageList messages={messagesNonUser} onMessageFeedback={mockOnFeedback} />);
+
+    expect(screen.queryByTitle('Good response')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Bad response')).not.toBeInTheDocument();
+  });
+
+  it('calls onMessageFeedback with "like" when like button is clicked', () => {
+    const mockOnFeedback = jest.fn();
+    const assistantMessageId = 'a1';
+    const messages: Message[] = [
+      { id: assistantMessageId, text: 'Helpful AI response', sender: 'assistant', timestamp: new Date() }
+    ];
+    render(<MessageList messages={messages} onMessageFeedback={mockOnFeedback} />);
+
+    const likeButton = screen.getByTitle('Good response');
+    fireEvent.click(likeButton);
+
+    expect(mockOnFeedback).toHaveBeenCalledWith(assistantMessageId, 'like');
+  });
+
+  it('calls onMessageFeedback with "dislike" when dislike button is clicked', () => {
+    const mockOnFeedback = jest.fn();
+    const assistantMessageId = 'a1';
+    const messages: Message[] = [
+      { id: assistantMessageId, text: 'Unhelpful AI response', sender: 'assistant', timestamp: new Date() }
+    ];
+    render(<MessageList messages={messages} onMessageFeedback={mockOnFeedback} />);
+
+    const dislikeButton = screen.getByTitle('Bad response');
+    fireEvent.click(dislikeButton);
+
+    expect(mockOnFeedback).toHaveBeenCalledWith(assistantMessageId, 'dislike');
+  });
+
+  it('feedback buttons change color if feedback is set on message', () => {
+    const messages: Message[] = [
+      { id: 'a1', text: 'Liked response', sender: 'assistant', timestamp: new Date(), feedback: 'like' },
+      { id: 'a2', text: 'Disliked response', sender: 'assistant', timestamp: new Date(), feedback: 'dislike' }
+    ];
+    render(<MessageList messages={messages} onMessageFeedback={jest.fn()} />);
+
+    // For "Liked response"
+    const likedMessageButtons = screen.getByText('Liked response').parentElement?.querySelector('.message-feedback');
+    expect(likedMessageButtons?.querySelector('button[title="Good response"]')).toHaveStyle('color: green');
+    expect(likedMessageButtons?.querySelector('button[title="Bad response"]')).toHaveStyle('color: grey');
+
+    // For "Disliked response"
+    const dislikedMessageButtons = screen.getByText('Disliked response').parentElement?.querySelector('.message-feedback');
+    expect(dislikedMessageButtons?.querySelector('button[title="Good response"]')).toHaveStyle('color: grey');
+    expect(dislikedMessageButtons?.querySelector('button[title="Bad response"]')).toHaveStyle('color: red');
+  });
 });
 
 // Helper to setup testing environment if not using CRA or similar that includes jest-dom

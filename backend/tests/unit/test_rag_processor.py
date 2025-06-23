@@ -225,3 +225,72 @@ def test_rag_processor_handles_nonexistent_doc_path(rag_processor_instance: RAGP
 # TODO: Add tests for more complex Unstructured chunking scenarios if that path is stabilized.
 # TODO: Add tests for different embedding models if the RAGProcessor is made to support them dynamically.
 # TODO: Test edge cases in text cleaning or chunking if those become more complex.
+
+def test_search_with_nonexistent_index_files(tmp_path: Path): # Removed rag_processor_instance fixture here
+    # Create a new instance with paths that we know are empty for this specific test
+    empty_data_dir = tmp_path / "empty_rag_data_for_nonexistent_test"
+    empty_data_dir.mkdir(exist_ok=True) # Ensure parent dir exists
+    empty_index_path = str(empty_data_dir / "non_existent.idx")
+    empty_metadata_path = str(empty_data_dir / "non_existent_meta.json")
+
+    # Safety check: remove files if they somehow exist from a previous failed run
+    if os.path.exists(empty_index_path):
+        os.remove(empty_index_path)
+    if os.path.exists(empty_metadata_path):
+        os.remove(empty_metadata_path)
+
+    processor_no_index = RAGProcessor(
+        faiss_index_path=empty_index_path,
+        doc_metadata_path=empty_metadata_path
+    )
+    assert processor_no_index.index is None
+    assert len(processor_no_index.document_chunks) == 0
+
+    results = processor_no_index.search_similar_documents("query for non-existent index", k=1)
+    assert len(results) == 0
+
+@patch("faiss.read_index") # Mock faiss.read_index to simulate failure
+def test_search_with_corrupted_index_file(mock_read_index, rag_processor_instance: RAGProcessor, test_docs_path: Path, capsys):
+    # Create a dummy index file and metadata file so it attempts to load
+    # rag_processor_instance fixture already uses temporary paths.
+    # We need to ensure these temporary files are created for the test to then mock their read failure.
+
+    # Create placeholder files at the paths the rag_processor_instance expects
+    # This simulates that the files exist but are "corrupted" (mock will make read_index fail)
+    Path(rag_processor_instance.index_path).touch()
+    # Metadata needs to be valid JSON for initial load attempt in RAGProcessor constructor,
+    # or the constructor itself might fail before faiss.read_index is even called by _load_index_and_metadata.
+    # Let's write minimal valid JSON metadata.
+    with open(rag_processor_instance.metadata_path, 'w') as f:
+        json.dump([{"text": "dummy", "source": "dummy.md"}], f)
+
+
+    # Configure the mock to raise an error when faiss.read_index is called
+    mock_read_index.side_effect = RuntimeError("Simulated FAISS index corruption/read error")
+
+    # Create a new instance that will attempt to load the (conceptually) corrupted index
+    # The RAGProcessor's _load_index_and_metadata will call the mocked faiss.read_index
+    new_processor_corrupted_index = RAGProcessor(
+        faiss_index_path=rag_processor_instance.index_path, # Path from fixture where dummy files exist
+        doc_metadata_path=rag_processor_instance.metadata_path
+    )
+
+    assert new_processor_corrupted_index.index is None # Index loading should have failed
+
+    # Verify that an error message was printed/logged during __init__ via _load_index_and_metadata
+    # This requires RAGProcessor to print during _load_index_and_metadata on error.
+    # The RAGProcessor already prints: print(f"Error loading existing index or metadata: {e}. Indexing may be required.")
+    # So we check for this print output.
+    # Note: capsys might not capture prints from the __init__ of the object *being created*
+    # if the print happens before the object is fully returned/available to the test scope
+    # where capsys is active. A more reliable way is to check logs if proper logging is set up.
+    # For now, we rely on the print statement in RAGProcessor and hope capsys can get it or test its effect (index is None).
+
+    # We can also check the print from the search function
+    results = new_processor_corrupted_index.search_similar_documents("query", k=1)
+    assert len(results) == 0
+    captured_after_search = capsys.readouterr()
+    # Check for either the init error (if it was captured late) or the search error
+    assert "Error loading existing index or metadata: Simulated FAISS index corruption/read error" in captured_after_search.out \
+        or "FAISS index not loaded" in captured_after_search.out \
+        or "Still no index/metadata" in captured_after_search.out

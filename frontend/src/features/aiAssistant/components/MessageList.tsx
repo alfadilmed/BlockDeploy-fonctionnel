@@ -8,15 +8,16 @@ export interface Message {
   sender: 'user' | 'assistant' | 'system';
   timestamp: Date;
   type?: 'text' | 'code' | 'suggestion'; // For future extensibility
-  sources?: AISource[]; // New field for sources
-  // Add other relevant fields like structured_data for assistant messages
+  sources?: AISource[];
+  feedback?: 'like' | 'dislike' | null; // Store user feedback on this message
 }
 
 interface MessageListProps {
   messages: Message[];
+  onMessageFeedback?: (messageId: string, feedback: 'like' | 'dislike') => void; // Callback for feedback
 }
 
-const MessageList: React.FC<MessageListProps> = ({ messages }) => {
+const MessageList: React.FC<MessageListProps> = ({ messages, onMessageFeedback }) => {
   if (!messages || messages.length === 0) {
     // Adjusted the initial message for better UX within the panel context
     return <div style={{ textAlign: 'center', color: '#777', marginTop: '20px' }}>Send a message to start the conversation.</div>;
@@ -40,7 +41,6 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                              (msg.text.toLowerCase().startsWith("error:") ? '#f8d7da' : '#fff3cd')), // Rouge clair pour erreurs système
             color: msg.sender === 'user' ? 'white' :
                    (msg.text.toLowerCase().startsWith("error:") ? '#721c24' : '#333'), // Couleur de texte foncée pour erreurs
-            // Simple chat bubble effect
             position: 'relative',
             wordBreak: 'break-word',
           }}
@@ -58,7 +58,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         title={source.content_snippet || source.name}
-                        style={{ color: msg.sender === 'user' ? 'white' : '#0056b3' }} // Ensure link color contrasts
+                        style={{ color: msg.sender === 'user' ? 'white' : '#0056b3' }}
                       >
                         {source.name || source.url}
                       </a>
@@ -70,10 +70,29 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
               </ul>
             </div>
           )}
+          {/* Feedback buttons for assistant messages */}
+          {msg.sender === 'assistant' && onMessageFeedback && (
+            <div className="message-feedback" style={{ marginTop: '8px', textAlign: 'right' }}>
+              <button
+                title="Good response"
+                onClick={() => onMessageFeedback(msg.id, 'like')}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1em', marginRight: '5px', color: msg.feedback === 'like' ? 'green' : 'grey' }}
+              >
+                👍
+              </button>
+              <button
+                title="Bad response"
+                onClick={() => onMessageFeedback(msg.id, 'dislike')}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1em', color: msg.feedback === 'dislike' ? 'red' : 'grey' }}
+              >
+                👎
+              </button>
+            </div>
+          )}
           <div
             style={{
               fontSize: '0.7em',
-              color: msg.sender === 'user' ? '#cce5ff' : (msg.text.toLowerCase().startsWith("error:") ? '#b71c1c' : '#6c757d'), // Darker red for error time
+              color: msg.sender === 'user' ? '#cce5ff' : (msg.text.toLowerCase().startsWith("error:") ? '#b71c1c' : '#6c757d'),
               textAlign: 'right',
               marginTop: '4px'
             }}

@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     # Logging Configuration (placeholders)
     LOG_LEVEL: str = "INFO"
 
+    # Rate Limiting
+    DEFAULT_RATE_LIMIT: str = os.getenv("DEFAULT_RATE_LIMIT", "10/minute") # Default: 10 requests per minute per IP
+
     class Config:
         case_sensitive = True
         # env_file = ".env" # uncomment if you want to strictly load from .env without python-dotenv

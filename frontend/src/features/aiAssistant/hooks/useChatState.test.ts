@@ -272,4 +272,47 @@ describe('useChatState', () => {
     expect(result.current.isAssistantTyping).toBe(false);
   });
 
+  it('handleMessageFeedback updates message feedback state and logs to console', () => {
+    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const initialMessages: Message[] = [
+      { id: 'msg1', text: 'Initial assistant message', sender: 'assistant', timestamp: new Date() }
+    ];
+    // Prime localStorage for initial load
+    mockLocalStorage['aiChatHistory'] = JSON.stringify(initialMessages);
+
+    const { result } = renderHook(() => useChatState());
+
+    // Ensure messages are loaded (may need an act if loading is async, but current useState is sync)
+    // For this test, let's assume the initialMessages are reflected quickly or set them via prop if hook supported it.
+    // A robust way: add a message, then provide feedback on it.
+
+    act(() => {
+        // Simulate adding the message that will receive feedback
+        result.current.addMessage({ id: 'msgToFeedback', text: 'Assistant response to feedback', sender: 'assistant', timestamp: new Date() });
+    });
+
+    const messageToFeedbackId = 'msgToFeedback';
+
+    act(() => {
+      result.current.handleMessageFeedback(messageToFeedbackId, 'like');
+    });
+
+    const fedBackMessage = result.current.messages.find(m => m.id === messageToFeedbackId);
+    expect(fedBackMessage?.feedback).toBe('like');
+    expect(consoleLogSpy).toHaveBeenCalledWith(`Feedback for message ${messageToFeedbackId}: like`);
+
+    // Check if localStorage was updated with the feedback
+    const storedMessagesWithFeedback = JSON.parse(mockLocalStorage['aiChatHistory']);
+    const storedFedBackMessage = storedMessagesWithFeedback.find((m: Message) => m.id === messageToFeedbackId);
+    expect(storedFedBackMessage?.feedback).toBe('like');
+
+    act(() => {
+      result.current.handleMessageFeedback(messageToFeedbackId, 'dislike');
+    });
+    const newlyFedBackMessage = result.current.messages.find(m => m.id === messageToFeedbackId);
+    expect(newlyFedBackMessage?.feedback).toBe('dislike');
+    expect(consoleLogSpy).toHaveBeenCalledWith(`Feedback for message ${messageToFeedbackId}: dislike`);
+
+    consoleLogSpy.mockRestore();
+  });
 });

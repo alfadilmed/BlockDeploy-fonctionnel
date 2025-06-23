@@ -69,7 +69,8 @@ const {
     sendMessage,
     clearChat,
     isAssistantTyping,
-    sendContextualQuery // Get the new function from the hook
+    sendContextualQuery, // Get the new function from the hook
+    handleMessageFeedback // Get the feedback handler
 } = useChatState([]);
 
   const [isOpen, setIsOpen] = useState(true); // Panel is open by default
@@ -210,7 +211,7 @@ const {
         </div>
       </div>
       <div style={contentStyle}>
-        <MessageList messages={messages} />
+        <MessageList messages={messages} onMessageFeedback={handleMessageFeedback} />
         {isAssistantTyping && (
           <div style={{ fontStyle: 'italic', color: '#555', padding: '5px 0 0 10px', fontSize: '0.9em' }}>
             Assistant is typing...

@@ -15,3 +15,6 @@ faiss-cpu # For CPU version of FAISS. Use faiss-gpu for GPU version.
 PyPDF2 # If we need to process PDF documents for RAG
 Unstructured # For processing various document types, including Markdown
 markdown # To parse markdown if Unstructured needs it or for direct parsing
+
+# For Rate Limiting (M5)
+slowapi

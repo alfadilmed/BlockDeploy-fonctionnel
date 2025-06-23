@@ -151,15 +151,12 @@ export const useChatState = (initialMessages: Message[] = [], initialConversatio
     sendMessage,
     currentConversationId,
     clearChat,
-    // Function to pre-fill input and send, or just pre-fill
-    // For M4, let's make it send immediately.
     sendContextualQuery: useCallback(async (queryText: string, userId: string, context?: Partial<RequestContext>) => {
         setIsLoading(true);
         setError(null);
-        // Add a system message indicating contextual query, or just send user message directly
         const userMessage: Message = {
           id: generateUniqueId(),
-          text: queryText, // The pre-filled query
+          text: queryText,
           sender: 'user',
           timestamp: new Date(),
         };
@@ -175,12 +172,9 @@ export const useChatState = (initialMessages: Message[] = [], initialConversatio
                 role: m.sender === 'user' ? 'user' : 'assistant',
                 content: m.text
             })),
-            // Merge with any passed context
             ui_location: context?.ui_location,
             deployment_id: context?.deployment_id,
             current_configuration: context?.current_configuration,
-            // If field_id is part of context, it would be passed here
-            // field_id: context?.field_id
           }
         };
 
@@ -192,6 +186,7 @@ export const useChatState = (initialMessages: Message[] = [], initialConversatio
             sender: 'assistant',
             timestamp: new Date(aiResponse.timestamp),
             sources: aiResponse.assistant_response.sources,
+            // feedback: null, // Initial feedback state for new assistant messages
           };
           addMessage(assistantMessage, aiResponse.conversation_id);
           if (aiResponse.conversation_id && aiResponse.conversation_id !== currentConversationId) {
@@ -212,5 +207,18 @@ export const useChatState = (initialMessages: Message[] = [], initialConversatio
           setIsAssistantTyping(false);
         }
     }, [messages, addMessage, currentConversationId]),
+
+    handleMessageFeedback: useCallback((messageId: string, feedbackType: 'like' | 'dislike') => {
+      setMessages(prevMessages => {
+        const updatedMessages = prevMessages.map(msg =>
+          msg.id === messageId ? { ...msg, feedback: feedbackType } : msg
+        );
+        // Persist updated messages with feedback to localStorage
+        saveChatState(updatedMessages, currentConversationId);
+        return updatedMessages;
+      });
+      console.log(`Feedback for message ${messageId}: ${feedbackType}`);
+      // In a real application, this feedback would be sent to a backend endpoint.
+    }, [currentConversationId]), // Removed `messages` from dependency array as it's part of `setMessages`'s closure
   };
 };
