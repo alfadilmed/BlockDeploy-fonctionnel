@@ -5,36 +5,41 @@ from sentence_transformers import SentenceTransformer
 from typing import List, Tuple, Optional, Dict, Any
 import re # For basic text cleaning
 from pathlib import Path
+from ..core.config import settings # Import settings
 
 # Try to import Unstructured, fall back to basic markdown for simplicity if not fully set up
 try:
     from unstructured.partition.md import partition_md
-    from unstructured.chunking.title import chunk_by_title
+    # from unstructured.chunking.title import chunk_by_title # Not used in current chunking
     UNSTRUCTURED_AVAILABLE = True
 except ImportError:
     UNSTRUCTURED_AVAILABLE = False
     print("Warning: Unstructured library not found or not fully functional. Falling back to basic markdown processing for RAG.")
 
-# Configuration for RAG
-DEFAULT_EMBEDDING_MODEL = 'all-MiniLM-L6-v2' # A good default, lightweight model
-DEFAULT_FAISS_INDEX_PATH = "faiss_index.bin"
-DEFAULT_DOC_METADATA_PATH = "doc_metadata.json" # To store original text chunks or references
-
-# Ensure data directory exists for storing index and metadata
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-DATA_DIR.mkdir(exist_ok=True)
+# Data directory for storing index and metadata, relative to this file's location (app/services) -> app/data
+# This ensures that the data path is consistent regardless of where scripts are run from,
+# as long as the RAGProcessor is instantiated from within the app.
+APP_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+APP_DATA_DIR.mkdir(exist_ok=True)
 
 
 class RAGProcessor:
     def __init__(
         self,
-        embedding_model_name: str = DEFAULT_EMBEDDING_MODEL,
-        faiss_index_path: str = str(DATA_DIR / DEFAULT_FAISS_INDEX_PATH),
-        doc_metadata_path: str = str(DATA_DIR / DEFAULT_DOC_METADATA_PATH)
+        embedding_model_name: Optional[str] = None,
+        faiss_index_path: Optional[str] = None, # Path can be relative to APP_DATA_DIR or absolute
+        doc_metadata_path: Optional[str] = None # Path can be relative to APP_DATA_DIR or absolute
     ):
-        self.embedding_model = SentenceTransformer(embedding_model_name)
-        self.index_path = faiss_index_path
-        self.metadata_path = doc_metadata_path
+        _embedding_model_name = embedding_model_name or settings.EMBEDDING_MODEL_NAME
+        self.embedding_model = SentenceTransformer(_embedding_model_name)
+
+        # Resolve paths: if not absolute, assume relative to APP_DATA_DIR
+        _faiss_index_path = Path(faiss_index_path or settings.FAISS_INDEX_PATH)
+        self.index_path = str(APP_DATA_DIR / _faiss_index_path if not _faiss_index_path.is_absolute() else _faiss_index_path)
+
+        _doc_metadata_path = Path(doc_metadata_path or settings.DOC_METADATA_PATH)
+        self.metadata_path = str(APP_DATA_DIR / _doc_metadata_path if not _doc_metadata_path.is_absolute() else _doc_metadata_path)
+
         self.index: Optional[faiss.Index] = None
         self.document_chunks: List[Dict[str, Any]] = [] # Stores {"text": "chunk_text", "source": "doc_name.md"}
 

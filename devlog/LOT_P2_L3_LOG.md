@@ -128,3 +128,19 @@ Ce journal documente les activités, décisions, et progrès concernant l'implé
 - **Activité:** Documentation des tests effectués, mesures de sécurité, optimisations et conclusions dans `docs/phase_2/implementation/P2_L3_M5_TESTS_AND_SECURITY.md`.
 - **Statut M5:** **Terminée.** L'assistant a été testé plus en profondeur, des mesures de sécurité initiales et des optimisations ont été appliquées. Une fonctionnalité de feedback utilisateur a été ajoutée.
 - **Prochaine Étape (M6):** Préparation au Déploiement et Documentation Utilisateur (et connexion à un LLM réel).
+
+## [2024-08-09] - Milestone M6 (Lot P2-L3): Préparation au Déploiement & Documentation
+
+- **Activité:** Création du document de suivi `docs/phase_2/implementation/P2_L3_M6_DEPLOYMENT_AND_DOCS.md`.
+- **Activité:** Chemins de l'index FAISS et du modèle d'embedding rendus configurables via variables d'environnement (`config.py`, `RAGProcessor`, `scripts/index_documentation.py`, `.env.example` mis à jour).
+- **Activité:** Finalisation du `backend/Dockerfile` (ajout utilisateur non-root, labels).
+- **Activité:** Création du fichier `docker-compose.yml` à la racine du projet pour faciliter le lancement local du backend.
+- **Activité:** Création du fichier `backend/README.md` avec instructions complètes d'installation, configuration, indexation RAG, exécution des tests et lancement du service.
+- **Activité:** Mise à jour du plan d'implémentation global `docs/phase_2/P2_L3_AI_ASSISTANT_IMPLEMENTATION.md` pour refléter l'état final du lot.
+- **Activité:** Création du rapport de synthèse final `docs/phase_2/P2_L3_FINAL_SUMMARY.md` pour le Lot P2-L3.
+- **Activité:** Vérification fonctionnelle conceptuelle de bout en bout du pipeline (UI -> Backend RAG -> MockLLM -> UI).
+- **Statut M6:** **Terminée.**
+- **Clôture du Lot P2-L3:**
+    - Toutes les milestones de développement (M1 à M6) pour le Lot P2-L3 sont considérées comme complétées.
+    - L'AI Config Assistant dispose d'un backend fonctionnel avec RAG (utilisant un MockLLM), d'un frontend de chat initial, de tests, de documentation de base et de préparations pour le déploiement.
+- **Prochaine Étape Globale (Post P2-L3):** Intégration d'un LLM réel, tests utilisateurs approfondis, et itérations basées sur les retours.

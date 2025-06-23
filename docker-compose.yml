@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  ai_assistant_backend:
+    build:
+      context: ./backend
+      # Dockerfile is implicitly backend/Dockerfile
+    image: blockdeploy/ai-assistant-backend:latest # You can tag with specific versions
+    container_name: ai_assistant_backend_service
+    ports:
+      - "8000:8000" # Map host port 8000 to container port 8000
+    volumes:
+      # Mount the backend/app/data directory to persist FAISS index and metadata
+      # This is useful for local development if you re-index often and don't want to rebuild the image.
+      # For production, the index might be built into the image or fetched from a persistent store.
+      - ./backend/app/data:/app/data
+      # Example of mounting logs, if your app writes logs to a file in /app/logs
+      # - ./backend_logs:/app/logs
+    env_file:
+      - ./backend/.env # Load environment variables from .env file in backend directory
+    environment:
+      # You can also override or set additional environment variables here
+      # PYTHONUNBUFFERED: 1 # Ensures print statements and logs are sent straight to console
+      # LOG_LEVEL: "DEBUG"
+      # For production, you'd securely manage LLM_API_KEY (e.g., via Docker secrets, K8s secrets)
+      # rather than putting it directly in .env for a committed docker-compose.
+      # The .env file itself should be in .gitignore.
+      # LLM_API_KEY: "${LLM_API_KEY}" # Example if you want to pass it from host env
+      pass
+    restart: unless-stopped # Or 'always', 'on-failure'
+    # healthcheck: (If defined in Dockerfile and you want Docker Compose to use it)
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/"] # Match Dockerfile HEALTHCHECK
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 5s
+
+# Optional: Define named volumes if you prefer them over host mounts for data persistence
+# volumes:
+#   ai_assistant_data:
+#   ai_assistant_logs:
+
+# To run:
+# 1. Ensure you have an .env file in the ./backend directory with necessary variables.
+#    (Copy from .env.example and fill it)
+# 2. Build and run: `docker-compose up --build`
+# 3. To run in detached mode: `docker-compose up --build -d`
+# 4. To stop: `docker-compose down`
+# 5. To rebuild image: `docker-compose build ai_assistant_backend`
+#
+# Note on FAISS index:
+# If the FAISS index (faiss_index.bin, doc_metadata.json) is not present in ./backend/app/data
+# when the container starts, the RAGProcessor will initialize without an index.
+# You would need to run the indexing script.
+# - Option 1 (Build index into image): Modify Dockerfile to run scripts/index_documentation.py during build.
+#   This is good if docs don't change often. Image becomes larger.
+# - Option 2 (Run script in running container): `docker-compose exec ai_assistant_backend python scripts/index_documentation.py`
+#   This uses the volume mount, so index is persisted on the host.
+# - Option 3 (Run script locally, then start compose): Run `python backend/scripts/index_documentation.py` on host,
+#   then `docker-compose up`. The volume mount makes the index available. This is often easiest for local dev.
+#
+# For M6, Option 3 is assumed for local development ease. The volume mount for `/app/data` is key.
+# For production, building the index into the image (Option 1) or fetching it from a managed store is better.
+```

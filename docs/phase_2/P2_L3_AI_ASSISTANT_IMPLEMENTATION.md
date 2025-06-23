@@ -4,9 +4,9 @@
 
 ## 1. Objectif Général du Lot P2-L3
 
-L'objectif principal du Lot P2-L3 est de **transformer les plans et conceptions élaborés durant le Lot P2-L2 en un assistant IA fonctionnel et intégré à la plateforme BlockDeploy.** Ce lot couvrira le développement backend, l'intégration du Modèle de Langage Large (LLM), la mise en place de la stratégie RAG (Retrieval Augmented Generation), le développement frontend, les tests continus, et la collecte de feedback pour itérer vers un produit de qualité.
+L'objectif principal du Lot P2-L3 était de **transformer les plans et conceptions élaborés durant le Lot P2-L2 en un assistant IA fonctionnel (avec un LLM mocké pour cette phase) et conceptuellement intégrable à la plateforme BlockDeploy.** Ce lot a couvert le développement backend, l'intégration d'un MockLLMService, la mise en place d'un pipeline RAG fonctionnel avec FAISS, le développement frontend initial d'un panneau de chat, les tests unitaires et d'intégration de base, les considérations de sécurité et d'optimisation, ainsi que la préparation de la documentation pour un déploiement futur.
 
-L'assistant IA vise à :
+L'assistant IA, à l'issue de ce lot, est conçu pour :
 - Guider les utilisateurs dans la configuration de leurs déploiements.
 - Suggérer des configurations optimales basées sur les besoins exprimés et la documentation BlockDeploy.
 - Valider les configurations existantes et proposer des améliorations.
@@ -91,13 +91,23 @@ Basé sur les recommandations du Lot P2-L2, voici les milestones proposées pour
 - **LLM API:** OpenAI API (GPT-3.5/4, ou plus récent) ou Google Gemini API.
 - **Base de Données Vectorielles:** FAISS (pour commencer, si auto-hébergé et simple) ou une solution managée comme Pinecone/Weaviate si le budget le permet et la complexité le justifie.
 - **Tests:** Pytest (backend), Jest/React Testing Library/Vitest (frontend), Playwright/Cypress (E2E).
-- **CI/CD:** GitHub Actions, GitLab CI, ou équivalent.
+- **CI/CD:** GitHub Actions, GitLab CI, ou équivalent (non implémenté dans ce lot, mais à considérer pour la suite).
 
 ## 5. Gestion de Projet et Suivi
 
-- **Suivi des Tâches:** Utilisation d'un outil de gestion de projet (Jira, Trello, GitHub Issues).
-- **Communication:** Réunions régulières de suivi, canaux de communication dédiés.
-- **Revue de Code:** Toutes les modifications de code seront sujettes à revue par les pairs.
-- **Documentation:** Maintenue à jour tout au long du projet (`devlog/LOT_P2_L3_LOG.md` et les documents de conception P2-L2 comme référence).
+- **Suivi des Tâches:** Ce lot a été suivi via les instructions et les mises à jour dans `devlog/LOT_P2_L3_LOG.md`. Pour un projet d'équipe plus large, un outil comme Jira, Trello ou GitHub Issues serait utilisé.
+- **Communication:** Les échanges ont été simulés via les interactions avec l'utilisateur de cet outil.
+- **Revue de Code:** Le code généré a été conceptuellement revu à chaque étape. Dans un vrai projet, des Pull Requests et des revues par les pairs seraient obligatoires.
+- **Documentation:** Les documents de suivi de chaque milestone et le `devlog/LOT_P2_L3_LOG.md` ont été maintenus. Les documents de conception du Lot P2-L2 ont servi de référence constante.
 
-Ce plan sera la feuille de route pour le Lot P2-L3. Il pourra être ajusté en fonction des découvertes et des défis rencontrés durant l'implémentation.
+## 6. État Final à la Clôture du Lot P2-L3
+
+À la fin du Lot P2-L3 :
+- Le **backend** est fonctionnel avec une API `/query`, un pipeline RAG utilisant FAISS et `sentence-transformers`, une gestion des prompts adaptable, un `MockLLMService`, des protections initiales contre le prompt injection (via le system prompt), et un rate limiting de base. Les chemins de l'index RAG sont configurables. Il est conteneurisable via Docker et lançable avec Docker Compose.
+- Le **frontend** (React/TypeScript) dispose d'un panneau de chat fonctionnel (`AssistantChatPanel`) qui interagit avec le backend. Il gère l'historique local des messages, les états de chargement/erreur, l'affichage des réponses (y compris les sources RAG), un indicateur "typing...", et une fonctionnalité de feedback utilisateur (pouces). Une page de configuration mockée (`MockConfigPage`) démontre l'aide contextuelle.
+- Des **tests unitaires et d'intégration** couvrent les aspects clés du backend (services, endpoint, RAG) et du frontend (composants, hook d'état, service API).
+- La **documentation** inclut des README pour le backend, des suivis de milestones, et sera finalisée par un rapport de synthèse du lot.
+
+L'assistant n'est **pas encore connecté à un LLM réel** et n'a pas subi de tests utilisateurs approfondis ni de tests de charge en conditions réelles. Ces aspects sont prévus pour des étapes ultérieures.
+
+Ce plan a servi de feuille de route pour le Lot P2-L3. Les ajustements ont été faits au fil de l'eau et documentés dans le devlog et les suivis de milestones.
