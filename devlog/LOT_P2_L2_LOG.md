@@ -86,3 +86,20 @@ Ce journal documente les activités, décisions, et progrès concernant le déve
     - **M2/M3 (en parallèle/itération):** Finalisation et stabilisation du backend et des prompts.
     - **M5:** Tests et Itérations (Alpha/Beta utilisateurs) sur l'ensemble de l'expérience (Frontend + Backend + IA).
     - **M6:** Déploiement et Documentation Finale.
+
+## [2024-08-01] - Démarrage Milestone M5: Tests & Validation UX de l’Assistant IA
+
+- **Activité:** Création du plan de test `docs/phase_2/testing/P2_L2_M5_AI_ASSISTANT_TEST_PLAN.md`.
+    - Définition des objectifs et de la portée des tests.
+    - Élaboration d'une stratégie de test (tests automatisés unitaires/E2E, tests manuels).
+    - Création d'une checklist de cas de tests manuels couvrant les aspects fonctionnels, IA, UX et sécurité.
+    - Identification des erreurs, cas limites et comportements "edge" à tester, avec les résultats attendus.
+    - Listage des outils de test envisagés.
+    - Définition des critères de sortie pour la M5.
+- **Décision:** Ce plan de test (`P2_L2_M5_AI_ASSISTANT_TEST_PLAN.md`) sera la référence pour toutes les activités de test de l'assistant IA. Il vise à assurer une couverture complète et à garantir un haut niveau de qualité avant tout déploiement.
+- **Prochaines Étapes (court terme):**
+    - Exécution des tests unitaires et E2E automatisés (par les développeurs au fur et à mesure de M2, M3, M4).
+    - Organisation et exécution des sessions de tests manuels exploratoires basées sur la checklist.
+    - Collecte et suivi des bugs identifiés.
+- **Prochaines Étapes (lots suivants):**
+    - **M6:** Déploiement (potentiellement progressif), documentation finale et préparation de la communication. Les retours des tests M5 influenceront directement les ajustements avant M6.
