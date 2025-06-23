@@ -61,8 +61,16 @@ def test_build_prompt_with_rag_context(
 
     # Check that user query and other context are still present
     assert f"User Query: {sample_request_dto.query_text}" in prompt
-    assert "User is currently at: docs_page" in prompt
-    assert "User: Tell me about advanced features." in prompt
+    assert "User is currently at: docs_page" in prompt # From sample_request_dto
+    assert "User: Tell me about advanced features." in prompt # From sample_request_dto history
+
+    # Check that no task-specific instructions were added for this generic query
+    # This depends on the default template structure. If the placeholder is always there,
+    # it might be filled with an empty string or a default "no specific task" message.
+    # Based on current PromptManager, if no conditions match, task_specific_instructions is "".
+    # The template then might have an empty line. Let's check that specific known instructions are NOT there.
+    assert "The user is asking to generate a configuration for an ERC-20 token." not in prompt
+    assert "The user is asking for an explanation of the" not in prompt
 
 
 def test_build_prompt_when_rag_finds_no_documents(
@@ -185,3 +193,86 @@ def test_prompt_manager_init_with_rag_processor_instance(mock_rag_processor):
     prompt = pm.build_prompt(dto) # Should call mock_rag_processor.search_similar_documents
     mock_rag_processor.search_similar_documents.assert_called_once_with("Hello", k=3)
     assert "Relevant RAG document 1 content." in prompt # From mock_rag_processor fixture default
+
+def test_build_prompt_with_erc20_generation_context(
+    prompt_manager_with_mock_rag: PromptManager,
+    mock_rag_processor: MagicMock
+):
+    erc20_request = AIQueryRequestDTO(
+        user_id="erc20_user",
+        query_text="generate config for erc20 token 'MyCoin' symbol 'MYC'",
+        context=ContextData(ui_location="smart_contracts/new_erc20")
+    )
+    prompt = prompt_manager_with_mock_rag.build_prompt(erc20_request)
+
+    mock_rag_processor.search_similar_documents.assert_called_once_with(
+        "generate config for erc20 token 'MyCoin' symbol 'MYC' (context: new_erc20)", k=3
+    )
+    assert "The user is asking to generate a configuration for an ERC-20 token." in prompt
+    assert "Retrieved Documentation Context:" in prompt # RAG context should still be there
+
+def test_build_prompt_with_parameter_explanation_context_from_ui_location(
+    prompt_manager_with_mock_rag: PromptManager,
+    mock_rag_processor: MagicMock
+):
+    param_request = AIQueryRequestDTO(
+        user_id="param_user",
+        query_text="What does this do?", # User might ask a generic question
+        context=ContextData(ui_location="deployment_settings/explain_parameter_gasLimit")
+    )
+    prompt = prompt_manager_with_mock_rag.build_prompt(param_request)
+
+    # Check if RAG search query was augmented
+    # Based on current logic: "What does this do? gasLimit"
+    mock_rag_processor.search_similar_documents.assert_called_once_with(
+        "What does this do? gasLimit", k=3
+    )
+    assert "The user is asking for an explanation of the 'gasLimit' parameter." in prompt
+    assert "Retrieved Documentation Context:" in prompt
+
+def test_build_prompt_with_parameter_explanation_context_from_query(
+    prompt_manager_with_mock_rag: PromptManager,
+    mock_rag_processor: MagicMock
+):
+    param_request = AIQueryRequestDTO(
+        user_id="param_user_q",
+        query_text="Can you explain the parameter 'replicas'?",
+        context=ContextData(ui_location="some_other_page") # ui_location doesn't indicate param here
+    )
+    prompt = prompt_manager_with_mock_rag.build_prompt(param_request)
+
+    mock_rag_processor.search_similar_documents.assert_called_once_with(
+        "Can you explain the parameter 'replicas'? (context: some_other_page)", k=3
+    )
+    assert "The user is asking for an explanation of the 'replicas' parameter." in prompt
+    assert "Retrieved Documentation Context:" in prompt
+
+def test_rag_search_query_augmentation(
+    prompt_manager_with_mock_rag: PromptManager,
+    mock_rag_processor: MagicMock
+):
+    # Case 1: ui_location suggests parameter explanation
+    request_explain = AIQueryRequestDTO(
+        user_id="test", query_text="Tell me more.",
+        context=ContextData(ui_location="form/explain_parameter_maxRetries")
+    )
+    prompt_manager_with_mock_rag.build_prompt(request_explain)
+    mock_rag_processor.search_similar_documents.assert_called_with("Tell me more. maxRetries", k=3)
+    mock_rag_processor.search_similar_documents.reset_mock()
+
+    # Case 2: ui_location is generic, query is generic
+    request_generic = AIQueryRequestDTO(
+        user_id="test", query_text="Help me.",
+        context=ContextData(ui_location="dashboard")
+    )
+    prompt_manager_with_mock_rag.build_prompt(request_generic)
+    mock_rag_processor.search_similar_documents.assert_called_with("Help me. (context: dashboard)", k=3)
+    mock_rag_processor.search_similar_documents.reset_mock()
+
+    # Case 3: No ui_location
+    request_no_loc = AIQueryRequestDTO(
+        user_id="test", query_text="What is BlockDeploy?",
+        context=ContextData() # No ui_location
+    )
+    prompt_manager_with_mock_rag.build_prompt(request_no_loc)
+    mock_rag_processor.search_similar_documents.assert_called_with("What is BlockDeploy?", k=3)

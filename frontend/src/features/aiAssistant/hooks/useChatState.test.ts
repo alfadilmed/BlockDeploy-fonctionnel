@@ -192,4 +192,84 @@ describe('useChatState', () => {
     expect(calledWithPayload.context?.conversation_history?.[1].content).toBe('First AI response');
   });
 
+  it('sendContextualQuery successfully adds user message, calls API with context, and adds assistant message', async () => {
+    const mockApiResponse: apiService.AIQueryResponse = {
+      conversation_id: 'conv-ctx-456',
+      response_id: 'resp-ctx-def',
+      assistant_response: { text_response: 'AI explains contextually!' },
+      timestamp: new Date().toISOString(),
+    };
+    mockFetchAIResponse.mockResolvedValue(mockApiResponse);
+
+    const { result } = renderHook(() => useChatState());
+    const contextualQuery = "Explain 'gasLimit'";
+    const userId = 'user-ctx-001';
+    const context: apiService.RequestContext = {
+      ui_location: 'deployment_settings/explain_parameter_gasLimit',
+      // field_id: 'gasLimit' // field_id is not explicitly in RequestContext yet, but ui_location implies it
+    };
+
+    await act(async () => {
+      result.current.sendContextualQuery(contextualQuery, userId, context);
+    });
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(result.current.messages.length).toBe(2); // User (contextual) message + Assistant message
+
+    const userMsg = result.current.messages[0];
+    expect(userMsg.text).toBe(contextualQuery);
+    expect(userMsg.sender).toBe('user');
+
+    const assistantMsg = result.current.messages[1];
+    expect(assistantMsg.text).toBe('AI explains contextually!');
+    expect(assistantMsg.sender).toBe('assistant');
+
+    expect(result.current.currentConversationId).toBe('conv-ctx-456');
+    expect(mockFetchAIResponse).toHaveBeenCalledTimes(1);
+    const calledWithPayload = mockFetchAIResponse.mock.calls[0][0] as apiService.AIQueryRequest;
+    expect(calledWithPayload.user_id).toBe(userId);
+    expect(calledWithPayload.query_text).toBe(contextualQuery);
+    expect(calledWithPayload.context?.ui_location).toBe(context.ui_location);
+    // expect(calledWithPayload.context?.field_id).toBe(context.field_id); // If field_id were added to DTO
+  });
+
+  it('isAssistantTyping state is handled correctly during sendMessage and sendContextualQuery', async () => {
+    mockFetchAIResponse.mockImplementation(async () => {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 50));
+      return {
+        conversation_id: 'conv-typing-test',
+        response_id: 'resp-typing-test',
+        assistant_response: { text_response: 'Done typing.' },
+        timestamp: new Date().toISOString(),
+      };
+    });
+
+    const { result } = renderHook(() => useChatState());
+
+    // Test with sendMessage
+    let promiseSendMessage = null;
+    act(() => {
+      promiseSendMessage = result.current.sendMessage('Test typing for send', 'user-typing-1');
+      // Immediately after calling, before await, isAssistantTyping should be true
+      expect(result.current.isAssistantTyping).toBe(true);
+    });
+    await act(async () => { await promiseSendMessage; });
+    expect(result.current.isAssistantTyping).toBe(false);
+
+    // Reset for next call
+    mockFetchAIResponse.mockClear();
+    act(() => { result.current.clearChat(); }); // Clear messages and typing state
+
+    // Test with sendContextualQuery
+    let promiseSendContextualQuery = null;
+    act(() => {
+      promiseSendContextualQuery = result.current.sendContextualQuery('Test typing for contextual', 'user-typing-2', {ui_location: 'test'});
+      expect(result.current.isAssistantTyping).toBe(true);
+    });
+    await act(async () => { await promiseSendContextualQuery; });
+    expect(result.current.isAssistantTyping).toBe(false);
+  });
+
 });

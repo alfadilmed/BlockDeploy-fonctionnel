@@ -14,6 +14,7 @@ import {
 export interface ChatState {
   messages: Message[];
   isLoading: boolean;
+  isAssistantTyping: boolean; // New state for typing indicator
   error: AIErrorResponse | null;
   currentConversationId?: string;
 }
@@ -23,11 +24,12 @@ const generateUniqueId = () => `msg_${Date.now()}_${Math.random().toString(36).s
 
 export const useChatState = (initialMessages: Message[] = [], initialConversationId?: string) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Overall loading for user submission
+  const [isAssistantTyping, setIsAssistantTyping] = useState<boolean>(false); // Specific for AI "typing"
   const [error, setError] = useState<AIErrorResponse | null>(null);
   const [currentConversationId, setCurrentConversationId] = useState<string | undefined>(initialConversationId);
 
-  // Load messages from localStorage on init (simplified)
+  // Load messages from localStorage on init
   // In a real app, this would be more robust, perhaps in a useEffect with one-time exec
   useState(() => {
     try {
@@ -75,18 +77,20 @@ export const useChatState = (initialMessages: Message[] = [], initialConversatio
       timestamp: new Date(),
     };
     addMessage(userMessage); // Add user message immediately
+    setIsAssistantTyping(true); // Assistant starts "typing"
 
     const requestPayload: AIQueryRequest = {
-      user_id: userId, // This needs to be sourced from app's auth state
+      user_id: userId,
       query_text: queryText,
       conversation_id: currentConversationId,
       context: {
-        // Prepare conversation history for the backend (e.g., last N messages)
-        conversation_history: messages.slice(-5).map(m => ({ // Send last 5 messages as history
+        // Send last 9 previous messages (excluding current user msg, as it's already added to local state)
+        // Backend might have different strategy for including current query in its own history/context for LLM
+        conversation_history: messages.slice(-10, -1).map(m => ({
             role: m.sender === 'user' ? 'user' : 'assistant',
             content: m.text
         })),
-        // ui_location: "TBD_from_app_context" // This would be passed in or obtained globally
+        // ui_location would be passed from AssistantChatPanel or a context provider
       }
     };
 
@@ -98,8 +102,7 @@ export const useChatState = (initialMessages: Message[] = [], initialConversatio
         text: aiResponse.assistant_response.text_response,
         sender: 'assistant',
         timestamp: new Date(aiResponse.timestamp),
-        // structured_data: aiResponse.assistant_response.structured_data, // For future use
-        // sources: aiResponse.assistant_response.sources, // For future use
+        sources: aiResponse.assistant_response.sources, // Pass sources here
       };
       addMessage(assistantMessage, aiResponse.conversation_id);
 
@@ -110,7 +113,6 @@ export const useChatState = (initialMessages: Message[] = [], initialConversatio
     } catch (apiError) {
       const err = apiError as AIErrorResponse;
       setError(err);
-      // Optionally add a system error message to the chat
       const systemErrorMessage: Message = {
         id: generateUniqueId(),
         text: `Error: ${err.message || 'Failed to get response from assistant.'}`,
@@ -120,16 +122,17 @@ export const useChatState = (initialMessages: Message[] = [], initialConversatio
       addMessage(systemErrorMessage);
     } finally {
       setIsLoading(false);
+      setIsAssistantTyping(false); // Assistant stops "typing"
     }
-  }, [messages, addMessage, currentConversationId]); // Include currentConversationId in dependencies
+  }, [messages, addMessage, currentConversationId]);
 
   const clearChat = useCallback(() => {
     setMessages([]);
     setCurrentConversationId(undefined);
     setError(null);
+    setIsAssistantTyping(false); // Ensure typing indicator is off
     localStorage.removeItem('aiChatHistory');
     localStorage.removeItem('aiChatConversationId');
-     // Optionally add a system message like "Chat cleared"
     const systemMessage: Message = {
         id: generateUniqueId(),
         text: "Chat history cleared.",
@@ -137,17 +140,77 @@ export const useChatState = (initialMessages: Message[] = [], initialConversatio
         timestamp: new Date(),
       };
     addMessage(systemMessage);
-
-
   }, [addMessage]);
 
 
   return {
     messages,
     isLoading,
+    isAssistantTyping,
     error,
     sendMessage,
     currentConversationId,
-    clearChat, // Expose clearChat
+    clearChat,
+    // Function to pre-fill input and send, or just pre-fill
+    // For M4, let's make it send immediately.
+    sendContextualQuery: useCallback(async (queryText: string, userId: string, context?: Partial<RequestContext>) => {
+        setIsLoading(true);
+        setError(null);
+        // Add a system message indicating contextual query, or just send user message directly
+        const userMessage: Message = {
+          id: generateUniqueId(),
+          text: queryText, // The pre-filled query
+          sender: 'user',
+          timestamp: new Date(),
+        };
+        addMessage(userMessage);
+        setIsAssistantTyping(true);
+
+        const requestPayload: AIQueryRequest = {
+          user_id: userId,
+          query_text: queryText,
+          conversation_id: currentConversationId,
+          context: {
+            conversation_history: messages.slice(-10, -1).map(m => ({
+                role: m.sender === 'user' ? 'user' : 'assistant',
+                content: m.text
+            })),
+            // Merge with any passed context
+            ui_location: context?.ui_location,
+            deployment_id: context?.deployment_id,
+            current_configuration: context?.current_configuration,
+            // If field_id is part of context, it would be passed here
+            // field_id: context?.field_id
+          }
+        };
+
+        try {
+          const aiResponse: AIQueryResponse = await fetchAIResponse(requestPayload);
+          const assistantMessage: Message = {
+            id: aiResponse.response_id || generateUniqueId(),
+            text: aiResponse.assistant_response.text_response,
+            sender: 'assistant',
+            timestamp: new Date(aiResponse.timestamp),
+            sources: aiResponse.assistant_response.sources,
+          };
+          addMessage(assistantMessage, aiResponse.conversation_id);
+          if (aiResponse.conversation_id && aiResponse.conversation_id !== currentConversationId) {
+            setCurrentConversationId(aiResponse.conversation_id);
+          }
+        } catch (apiError) {
+          const err = apiError as AIErrorResponse;
+          setError(err);
+          const systemErrorMessage: Message = {
+            id: generateUniqueId(),
+            text: `Error: ${err.message || 'Failed to get response from assistant.'}`,
+            sender: 'system',
+            timestamp: new Date(),
+          };
+          addMessage(systemErrorMessage);
+        } finally {
+          setIsLoading(false);
+          setIsAssistantTyping(false);
+        }
+    }, [messages, addMessage, currentConversationId]),
   };
 };

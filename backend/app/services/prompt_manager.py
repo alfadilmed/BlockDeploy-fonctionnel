@@ -1,4 +1,5 @@
 from typing import Dict, Any, Optional, List
+import re # Import re for regex search in prompt building
 
 from ..api.v1.schemas import AIQueryRequestDTO, ContextData
 from .rag_processor import RAGProcessor # Import RAGProcessor
@@ -23,6 +24,8 @@ class PromptManager:
 You are "BlockDeploy AI Assistant", an expert specialized in the configuration of projects on the BlockDeploy platform.
 Your mission is to help users create, optimize, and troubleshoot their configurations effectively and securely.
 You are precise, factual, and base your answers on the information provided about BlockDeploy.
+
+{task_specific_instructions}
 
 Use the following context from the BlockDeploy documentation to answer the user's query.
 If the context does not contain the answer, state that the information is not found in the provided documents.
@@ -89,8 +92,19 @@ Please respond to the following user query:
         retrieved_docs_str = "N/A (RAG not available or no documents found)"
         if self.rag_processor:
             try:
-                # Use user_query to fetch relevant documents
-                relevant_docs = self.rag_processor.search_similar_documents(user_query, k=3) # Fetch top 3 docs
+                # Potentially use more specific context for RAG search if available
+                search_query = user_query
+                if request_dto.context and request_dto.context.ui_location:
+                    # Example: "explain gasLimit from deployment_settings page"
+                    # This is a simple heuristic; more sophisticated context integration might be needed.
+                    context_hint = request_dto.context.ui_location.split('/')[-1] # e.g., "deployment_x" or "explain_parameter_gasLimit"
+                    if "explain_parameter_" in context_hint:
+                        param_name_from_loc = context_hint.replace("explain_parameter_", "")
+                        search_query = f"{user_query} {param_name_from_loc}" # Add param name to search if explaining
+                    else:
+                        search_query = f"{user_query} (context: {context_hint})"
+
+                relevant_docs = self.rag_processor.search_similar_documents(search_query, k=3)
                 if relevant_docs:
                     retrieved_docs_str = self._format_retrieved_documents(relevant_docs)
                 else:
@@ -101,17 +115,44 @@ Please respond to the following user query:
 
         user_context_str = "N/A"
         conversation_history_str = "N/A"
+        task_specific_instructions = "" # Default: no specific instructions
 
         if request_dto.context:
-            user_context_str = self._format_context(request_dto.context)
+            user_context_str = self._format_context(request_dto.context) # This formats ui_location, deployment_id etc.
             if request_dto.context.conversation_history:
                 conversation_history_str = self._format_conversation_history(request_dto.context.conversation_history)
 
+            # Add task-specific instructions based on context or query
+            # This is a simplified approach. A more robust intent detection might be needed.
+            query_lower = user_query.lower()
+            ui_location_lower = request_dto.context.ui_location.lower() if request_dto.context.ui_location else ""
+
+            if "generate config" in query_lower and "erc20" in query_lower or "erc-20" in query_lower:
+                task_specific_instructions = "The user is asking to generate a configuration for an ERC-20 token. Focus on providing a valid YAML snippet based on BlockDeploy's `smartContracts` structure. Use information from the retrieved documents about ERC-20 configuration."
+            elif "explain" in query_lower and ("parameter" in query_lower or ui_location_lower.startswith("explain_parameter_")):
+                param_name_hint = ""
+                if ui_location_lower.startswith("explain_parameter_"):
+                    param_name_hint = ui_location_lower.replace("explain_parameter_", "")
+                # Try to extract param name from query if not in ui_location
+                # This is very basic, regex or NLP could be better
+                match = re.search(r"(?:parameter|option|setting)\s+['\"]?([a-zA-Z0-9_]+)['\"]?", query_lower)
+                if match and not param_name_hint:
+                    param_name_hint = match.group(1)
+
+                if param_name_hint:
+                    task_specific_instructions = f"The user is asking for an explanation of the '{param_name_hint}' parameter. Provide a clear and concise explanation using the retrieved documentation. If the parameter is part of a YAML structure, you can show an example."
+                else:
+                    task_specific_instructions = "The user is asking for an explanation of a configuration parameter or concept. Provide a clear and concise explanation using the retrieved documentation."
+            elif "what is" in query_lower and "gaslimit" in query_lower: # More specific example
+                 task_specific_instructions = "The user is asking for an explanation of 'gasLimit'. Provide a clear and concise explanation using the retrieved documentation, including typical values and where it's used."
+
+
         system_part = self.system_prompt_template.format(
-            retrieved_docs_str=retrieved_docs_str, # Add RAG context
+            task_specific_instructions=task_specific_instructions,
+            retrieved_docs_str=retrieved_docs_str,
             user_context_str=user_context_str,
             conversation_history_str=conversation_history_str
-        ).strip() # Ensure leading/trailing whitespace from template is removed
+        ).strip()
 
         full_prompt = f"{system_part}\n\nUser Query: {user_query}"
 

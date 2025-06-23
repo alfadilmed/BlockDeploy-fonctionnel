@@ -83,3 +83,27 @@ Ce journal documente les activités, décisions, et progrès concernant l'implé
 - **Activité:** Documentation des actions, choix d'implémentation et structure dans `docs/phase_2/implementation/P2_L3_M3_CHAT_FRONTEND.md`.
 - **Statut M3:** **Terminée.** Une première version fonctionnelle de l'interface du panneau de chat est en place et testée unitairement.
 - **Prochaine Étape (M4):** Itération sur les Fonctionnalités Clés et Intégration Avancée (connexion LLM réel, affinage RAG, fonctionnalités spécifiques).
+
+## [2024-08-07] - Milestone M4 (Lot P2-L3): Itération sur les Fonctionnalités Clés et Aide Contextuelle
+
+- **Activité:** Création du document de suivi `docs/phase_2/implementation/P2_L3_M4_CONTEXTUAL_ASSISTANT.md`.
+- **Activité:** Amélioration de la gestion d'erreurs et feedbacks UI (Frontend) :
+    - Styles des messages d'erreur système améliorés dans `MessageList.tsx`.
+    - Ajout de l'état `isAssistantTyping` dans `useChatState` et affichage "Assistant is typing..." dans `AssistantChatPanel`.
+    - `MessageList.tsx` et `useChatState` adaptés pour afficher les sources RAG sous les messages de l'assistant.
+- **Activité:** Affinage du pipeline RAG pour cas d'usage ciblés (Backend & Contenu) :
+    - Création de documents de connaissance spécifiques (`docs/knowledge_base/erc20_token_config.md`, `docs/knowledge_base/deployment_parameters.md`).
+    - (Conceptuellement) Ré-indexation de la documentation.
+- **Activité:** Mise à jour des Prompts (Backend) :
+    - `PromptManager` modifié pour inclure `{task_specific_instructions}` et pour utiliser `ui_location` afin d'affiner la recherche RAG et les instructions LLM.
+- **Activité:** Implémentation de l'aide contextuelle (Frontend & Backend) :
+    - Création du composant `MockConfigPage.tsx` avec boutons d'aide contextuelle.
+    - Ajout de la fonction `sendContextualQuery` à `useChatState` pour gérer les requêtes contextuelles.
+    - Le backend (`PromptManager`) utilise le contexte UI enrichi.
+- **Activité:** Ajout et adaptation des tests (Frontend & Backend) :
+    - Tests pour `sendContextualQuery` dans `useChatState.test.ts`.
+    - Tests pour `MockConfigPage.test.tsx`.
+    - Adaptation des tests de `test_prompt_manager_with_rag.py` pour les nouvelles logiques de prompt.
+- **Activité:** Documentation des actions, choix et conclusions dans `docs/phase_2/implementation/P2_L3_M4_CONTEXTUAL_ASSISTANT.md`.
+- **Statut M4:** **Terminée.** L'assistant est plus intelligent, avec des feedbacks améliorés et une première version de l'aide contextuelle.
+- **Prochaine Étape (M5):** Tests Complets, Sécurité et Optimisation (incluant le passage à un LLM réel).
