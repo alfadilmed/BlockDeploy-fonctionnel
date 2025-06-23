@@ -68,3 +68,21 @@ Ce journal documente les activités, décisions, et progrès concernant le déve
     - **M4:** Développement de la stratégie RAG et affinage avancé des prompts basé sur la documentation BlockDeploy.
     - **M5:** Tests utilisateurs pour valider l'efficacité et la sécurité des prompts.
     - **M6:** Déploiement et Documentation Finale.
+
+## [2024-07-31] - Démarrage Milestone M4: Intégration Frontend de l’Assistant IA
+
+- **Activité:** Création du document de conception de l'intégration frontend `docs/phase_2/ui_ux/P2_L2_M4_AI_FRONTEND_INTEGRATION.md`.
+    - Définition des objectifs de l'intégration frontend.
+    - Proposition d'une UI/UX pour le composant assistant (panneau latéral de chat flottant et aide contextuelle).
+    - Description des flux d'intégration avec l'API backend (envoi de requêtes, réception et affichage des réponses).
+    - Spécification des éléments visuels de feedback (états de chargement, affichage des erreurs et des suggestions).
+    - Planification de la gestion de l'historique de discussion côté client.
+    - Prise en compte des aspects d'accessibilité (a11y).
+- **Décision:** Ce document (`P2_L2_M4_AI_FRONTEND_INTEGRATION.md`) guidera le développement effectif des composants frontend de l'assistant IA. Il s'appuie sur les travaux des M1 (UX général), M2 (API Backend) et M3 (Prompts).
+- **Prochaines Étapes (court terme):**
+    - Commencer le développement des composants React/Vue/Angular (selon la stack de BlockDeploy) pour le panneau de chat et les interactions de base.
+    - Implémenter les appels à l'API backend (mockée ou réelle si M2 est suffisamment avancée).
+- **Prochaines Étapes (lots suivants):**
+    - **M2/M3 (en parallèle/itération):** Finalisation et stabilisation du backend et des prompts.
+    - **M5:** Tests et Itérations (Alpha/Beta utilisateurs) sur l'ensemble de l'expérience (Frontend + Backend + IA).
+    - **M6:** Déploiement et Documentation Finale.
