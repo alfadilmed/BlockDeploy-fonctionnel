@@ -397,4 +397,58 @@
     - Cela est utile pour les tests, les démonstrations et pour que les nouveaux utilisateurs découvrent rapidement les capacités du builder.
     - La dApp d'exemple elle-même (`initializeDemoDApp` dans le store) sera revue à la prochaine étape pour s'assurer qu'elle est pertinente.
 
+---
+
+**Milestone P2-L1-I19: Migration vers Next.js App Router et Nettoyage**
+- Date: 2024-08-02
+- Avancement: Terminé
+- Description des Actions:
+    - Suppression de l'ancienne structure de routage basées sur Vite et `react-router-dom` (fichiers `pages/`, `App.tsx`, `index.tsx`, `vite.config.ts`, `index.html`). Les fichiers obsolètes ont été déplacés vers `legacy/`.
+    - Mise en place de la structure App Router de Next.js :
+        - Création de `app/layout.tsx` et `app/globals.css`.
+        - Création de `app/page.tsx` (page d'accueil).
+        - Création de `app/dapp-builder/[slug]/page.tsx` pour le constructeur de dApp.
+    - Intégration de `MainEditorLayout.tsx` dans `app/dapp-builder/[slug]/page.tsx`:
+        - Ajout de la directive `"use client"` à `MainEditorLayout.tsx` et à ses composants enfants si nécessaire (implicite pour les placeholders).
+        - Passage de `initialSlug` comme prop.
+        - Ajout de `data-testid="builder-canvas"` au composant `CanvasArea` dans `MainEditorLayout.tsx` pour les tests E2E.
+    - Mise à jour de `package.json`:
+        - Suppression de `vite` et `react-router-dom`.
+        - Ajout de `next`, `eslint`, `eslint-config-next`.
+        - Mise à jour des scripts (`dev`, `build`, `start`, `lint`).
+        - Ajout de `zustand` comme dépendance (utilisé par `builderStore`).
+        - Ajustement des versions de React (passage à la v18, compatible avec Next.js 14) et des dépendances `@types/*`.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `app/layout.tsx` (créé)
+    - `app/globals.css` (créé)
+    - `app/page.tsx` (créé)
+    - `app/dapp-builder/[slug]/page.tsx` (créé)
+    - `src/modules/dapp-builder/editor-ui/MainEditorLayout.tsx` (mis à jour)
+    - `package.json` (mis à jour)
+    - `legacy/` (dossier créé avec fichiers App.tsx, index.tsx, vite.config.ts, index.html)
+    - `pages/` (supprimé)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Le frontend est maintenant structuré selon les conventions de Next.js App Router.
+    - Nécessite `npm install` pour mettre à jour les dépendances.
+
+---
+
+**Milestone P2-L1-I20: Ajout Test E2E Cypress pour le dApp Builder**
+- Date: 2024-08-02
+- Avancement: Terminé
+- Description des Actions:
+    - Création du fichier de test `cypress/e2e/dappBuilder.cy.ts` vérifiant que la page `/dapp-builder/default` charge et affiche l'élément avec `data-testid="builder-canvas"`.
+    - Création d'un fichier de configuration Cypress de base `cypress.config.ts` avec `baseUrl: 'http://localhost:3000'`.
+    - Ajout de `cypress` aux `devDependencies` dans `package.json`.
+    - Ajout du script npm `cy:test` (`cypress run --browser chrome`) dans `package.json`.
+- Livrables / Fichiers Créés ou Modifiés:
+    - `cypress/e2e/dappBuilder.cy.ts` (créé)
+    - `cypress.config.ts` (créé)
+    - `package.json` (mis à jour)
+    - `devlog/LOT_P2_L1_LOG.md` (mise à jour)
+- Notes / Décisions:
+    - Le test E2E de base valide le rendu initial du canvas du builder.
+    - Nécessite `npm install` pour installer Cypress.
+
 *(Les entrées de log seront ajoutées ici au fur et à mesure de l'avancement)*

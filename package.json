@@ -2,24 +2,30 @@
   "name": "blockdeploy70.5",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "cy:test": "cypress run --browser chrome"
   },
   "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "next": "14.2.5",
     "lucide-react": "^0.511.0",
     "@heroicons/react": "^2.2.0",
     "framer-motion": "^11.3.8",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "typescript": "~5.7.2",
-    "vite": "^6.2.0"
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "~5.5.3",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "cypress": "^13.13.1"
   }
 }

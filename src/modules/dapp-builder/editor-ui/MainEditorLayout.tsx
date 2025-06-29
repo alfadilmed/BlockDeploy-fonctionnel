@@ -4,14 +4,25 @@ import React, { useRef } from 'react';
 import useBuilderStore, { initializeDemoDApp } from '../state/builderStore';
 import { DAppDefinition } from '../types';
 
+"use client"; // Directive pour Next.js App Router
+
+import React, { useRef, useEffect } from 'react';
+// Ensure initializeDemoDApp is exported from your store and imported here
+import useBuilderStore, { initializeDemoDApp } from '../state/builderStore';
+import { DAppDefinition } from '../types';
+
 // Placeholder for sub-components - assuming they are defined elsewhere or will be
 // For this task, we only focus on adding the export button logic here or in a refined EditorHeader
 const ComponentPalette = () => <div style={{ border: '1px solid lightblue', padding: '10px', minWidth: '200px' }}>Component Palette Area</div>;
-const CanvasArea = () => <div style={{ border: '1px solid lightgreen', padding: '10px', flexGrow: 1 }}>Canvas Area</div>;
+const CanvasArea = () => <div data-testid="builder-canvas" style={{ border: '1px solid lightgreen', padding: '10px', flexGrow: 1 }}>Canvas Area</div>;
 const PropertiesPanel = () => <div style={{ border: '1px solid lightcoral', padding: '10px', minWidth: '250px' }}>Properties Panel Area</div>;
 
+interface EditorHeaderProps {
+  initialSlug?: string; // Optionnel, au cas où on voudrait l'utiliser ici
+}
+
 // Refined EditorHeader that includes Import and Export buttons
-const EditorHeader: React.FC = () => {
+const EditorHeader: React.FC<EditorHeaderProps> = ({ initialSlug }) => {
   const { currentDApp, setCurrentDApp } = useBuilderStore(state => ({
     currentDApp: state.currentDApp,
     setCurrentDApp: state.setCurrentDApp
@@ -128,15 +139,31 @@ const EditorHeader: React.FC = () => {
   );
 };
 
-// MainEditorLayout and other sub-components (ComponentPalette, CanvasArea, PropertiesPanel) remain the same.
-const ComponentPalette = () => <div style={{ border: '1px solid lightblue', padding: '10px', minWidth: '200px' }}>Component Palette Area</div>;
-const CanvasArea = () => <div style={{ border: '1px solid lightgreen', padding: '10px', flexGrow: 1 }}>Canvas Area</div>;
-const PropertiesPanel = () => <div style={{ border: '1px solid lightcoral', padding: '10px', minWidth: '250px' }}>Properties Panel Area</div>;
+interface MainEditorLayoutProps {
+  initialSlug?: string;
+}
 
-const MainEditorLayout: React.FC = () => {
+const MainEditorLayout: React.FC<MainEditorLayoutProps> = ({ initialSlug }) => {
+  const { setCurrentDApp } = useBuilderStore();
+
+  // Effet pour charger les données initiales ou un dApp basé sur le slug
+  useEffect(() => {
+    // Logique pour charger un dApp spécifique basé sur initialSlug
+    // Pour l'instant, on charge la démo par défaut si aucun slug spécifique n'est géré
+    // ou si on veut initialiser avec des données par défaut pour ce slug.
+    console.log("MainEditorLayout mounted with slug:", initialSlug);
+    // Exemple: si le slug est 'default' ou si on veut toujours charger la démo au montage pour cet exemple
+    if (initialSlug === 'default') { // Ou une logique plus complexe
+        const demoDApp = initializeDemoDApp(); // Assurez-vous que cela retourne la DApp et met à jour le store
+        // setCurrentDApp(demoDApp); // Si initializeDemoDApp ne met pas à jour le store directement
+    }
+    // Si vous avez une fonction pour charger par ID/slug :
+    // loadDAppBySlug(initialSlug);
+  }, [initialSlug, setCurrentDApp]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '10px' }}>
-      <EditorHeader />
+      <EditorHeader initialSlug={initialSlug} />
       <div style={{ display: 'flex', flexGrow: 1, gap: '10px', overflow: 'hidden' }}>
         <ComponentPalette />
         <CanvasArea />

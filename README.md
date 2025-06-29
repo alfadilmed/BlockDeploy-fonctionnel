@@ -12,15 +12,75 @@ BlockDeploy est une plateforme innovante conçue pour démocratiser l'accès à 
 *   **Flexibilité Multi-Chaînes :** Supporter le déploiement sur plusieurs réseaux blockchain majeurs (Ethereum, Polygon, BNB Chain, etc.).
 *   **Écosystème Complet :** Évoluer vers une suite d'outils Web3 intégrée, de la conception à la gestion post-déploiement.
 
-## 🛠 Tech Stack (Cible)
+## 🚀 Démarrage Rapide
 
-*   **Frontend:** Next.js, React, TypeScript, Tailwind CSS
-*   **Backend:** Node.js (Express.js) / NestJS (envisagé pour la robustesse)
-*   **Smart Contracts:** Solidity
-*   **Base de Données:** MongoDB (ou PostgreSQL pour des relations plus complexes à terme)
-*   **Interaction Blockchain:** Ethers.js / Viem
-*   **Authentification:** NextAuth.js / JWT
-*   **Hébergement:** Vercel (Frontend), AWS/Google Cloud (Backend & DB)
+### Prérequis
+
+*   Node.js (version 18.x ou supérieure recommandée)
+*   npm / yarn / pnpm
+
+### Installation
+
+1.  Clonez le dépôt :
+    ```bash
+    git clone [URL_DU_REPO]
+    cd blockdeploy
+    ```
+2.  Installez les dépendances (à la racine du projet pour le frontend Next.js) :
+    ```bash
+    npm install
+    # ou
+    # yarn install
+    # ou
+    # pnpm install
+    ```
+    Si vous travaillez également sur le backend (dans le dossier `backend/`), n'oubliez pas d'installer aussi ses dépendances.
+
+### Lancement de l'application Frontend (Next.js)
+
+Pour démarrer l'application en mode développement :
+
+```bash
+npm run dev
+```
+
+Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur pour voir l'application.
+La page principale du constructeur de dApp est accessible via [http://localhost:3000/dapp-builder/default](http://localhost:3000/dapp-builder/default).
+
+### Scripts Disponibles
+
+*   `npm run dev`: Lance l'application Next.js en mode développement.
+*   `npm run build`: Construit l'application Next.js pour la production.
+*   `npm run start`: Démarre un serveur Next.js de production (après un `build`).
+*   `npm run lint`: Lance ESLint pour analyser le code.
+*   `npm run cy:test`: Exécute les tests End-to-End avec Cypress en mode headless avec Chrome. (Assurez-vous que l'application est lancée sur `http://localhost:3000` dans un autre terminal).
+
+### Exécuter les Tests End-to-End (Cypress)
+
+1.  Assurez-vous que votre application de développement est en cours d'exécution :
+    ```bash
+    npm run dev
+    ```
+2.  Dans un autre terminal, exécutez les tests Cypress :
+    ```bash
+    npm run cy:test
+    ```
+    Pour ouvrir l'interface graphique de Cypress et exécuter les tests interactivement :
+    ```bash
+    npx cypress open
+    ```
+    (Nécessite que Cypress soit installé, ce qui est fait avec `npm install`).
+
+## 🛠 Tech Stack (Actuel Frontend & Cible Générale)
+
+*   **Frontend:** Next.js (App Router), React 18, TypeScript, Zustand, Tailwind CSS (à intégrer/confirmer), Lucide Icons, Framer Motion, Recharts.
+*   **Tests E2E:** Cypress
+*   **Backend (Cible):** Node.js (Express.js) / NestJS (envisagé pour la robustesse)
+*   **Smart Contracts (Cible):** Solidity
+*   **Base de Données (Cible):** MongoDB (ou PostgreSQL pour des relations plus complexes à terme)
+*   **Interaction Blockchain (Cible):** Ethers.js / Viem
+*   **Authentification (Cible):** NextAuth.js / JWT
+*   **Hébergement (Cible):** Vercel (Frontend), AWS/Google Cloud (Backend & DB)
 
 ## ✨ Fonctionnalités Principales (MVP et Vision)
 
